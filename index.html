@@ -1,201 +1,216 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deteksi Depresi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .fade-in {
-      animation: fadeIn 0.8s ease-in-out forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
-
-  <!-- Header -->
-  <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg">
+<body class="bg-gray-50 font-sans text-gray-800">
+  <!-- HEADER -->
+  <header class="fixed top-0 w-full bg-blue-900 text-white shadow-lg z-50">
     <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold">💙 Skrining Depresi</h1>
-      <nav class="hidden sm:flex gap-4">
-        <a href="#" class="hover:text-gray-200">Beranda</a>
-        <a href="#" class="hover:text-gray-200">Tentang</a>
-        <a href="#" class="hover:text-gray-200">Kontak</a>
+      <h1 class="text-xl font-bold">Deteksi Depresi</h1>
+      <nav>
+        <ul class="flex space-x-6 text-sm">
+          <li><a href="#" class="hover:text-gray-300">Beranda</a></li>
+          <li><a href="#" class="hover:text-gray-300">Tentang</a></li>
+          <li><a href="#" class="hover:text-gray-300">Kontak</a></li>
+        </ul>
       </nav>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="flex-grow max-w-3xl mx-auto px-6 py-10">
-    <!-- Form -->
-    <div id="form-section" class="bg-white p-6 rounded-2xl shadow-md fade-in">
-      <h2 class="text-xl font-semibold mb-4 text-indigo-600">Kuesioner PHQ-9</h2>
-      <p class="mb-6 text-gray-600">Jawablah sesuai kondisi Anda selama <b>2 minggu terakhir</b>.</p>
+  <!-- MAIN CONTENT -->
+  <main class="pt-28 pb-20 max-w-4xl mx-auto px-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Kuesioner Deteksi Depresi (PHQ-9)</h2>
+    <form id="quizForm" class="space-y-6">
 
-      <form id="quizForm" class="space-y-6">
-        <!-- Pertanyaan -->
-        <div id="questions"></div>
+      <!-- Pertanyaan 1 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">1. Dalam 2 minggu terakhir, seberapa sering Anda merasa sedih, murung, atau putus asa?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q1" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q1" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q1" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q1" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
 
-        <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition">
+      <!-- Pertanyaan 2 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">2. Kurang minat atau tidak bersemangat dalam melakukan kegiatan sehari-hari?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q2" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q2" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q2" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q2" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
+
+      <!-- Pertanyaan 3 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">3. Mengalami kesulitan tidur, sering terbangun, atau tidur terlalu banyak?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q3" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q3" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q3" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q3" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
+
+      <!-- Pertanyaan 4 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">4. Merasa lelah atau kurang energi?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q4" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q4" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q4" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q4" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
+
+      <!-- Pertanyaan 5 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">5. Nafsu makan berkurang atau makan berlebihan?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q5" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q5" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q5" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q5" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
+
+      <!-- Pertanyaan 6 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">6. Merasa buruk tentang diri sendiri, merasa gagal, atau menyalahkan diri berlebihan?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q6" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q6" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q6" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q6" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
+
+      <!-- Pertanyaan 7 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">7. Kesulitan berkonsentrasi, misalnya saat membaca koran atau menonton TV?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q7" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q7" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q7" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q7" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
+
+      <!-- Pertanyaan 8 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">8. Bergerak atau berbicara sangat lambat, atau sebaliknya terlalu gelisah sehingga sulit diam?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q8" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q8" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q8" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q8" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
+
+      <!-- Pertanyaan 9 -->
+      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <p class="font-medium mb-4">9. Pernahkah Anda berpikir lebih baik mati atau menyakiti diri sendiri?</p>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-3"><input type="radio" name="q9" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q9" value="1"><span>Beberapa hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q9" value="2"><span>Lebih dari setengah hari</span></label>
+          <label class="flex items-center space-x-3"><input type="radio" name="q9" value="3"><span>Hampir setiap hari</span></label>
+        </div>
+      </div>
+
+      <!-- Button Submit -->
+      <div class="text-center">
+        <button type="submit" class="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg shadow-md transition">
           Lihat Hasil
         </button>
-      </form>
-    </div>
-
-    <!-- Hasil -->
-    <div id="result-section" class="hidden mt-8 p-6 rounded-2xl shadow-md text-center fade-in">
-      <div id="icon" class="flex justify-center mb-4"></div>
-      <h2 id="result-title" class="text-2xl font-bold mb-2"></h2>
-      <p id="result-desc" class="text-gray-700 mb-4"></p>
-
-      <!-- Progress Bar -->
-      <div class="w-full bg-gray-200 rounded-full h-4 mb-6">
-        <div id="progress-bar" class="h-4 rounded-full" style="width:0%"></div>
       </div>
-      <p id="result-score" class="mb-6 text-sm text-gray-600"></p>
+    </form>
 
-      <p id="result-advice" class="font-medium mb-4"></p>
-      <blockquote id="result-motivation" class="italic text-lg text-indigo-700 mb-6"></blockquote>
-      <div class="flex gap-4 justify-center">
-        <button onclick="location.reload()" class="px-6 py-2 bg-gray-200 rounded-xl hover:bg-gray-300">Isi Ulang</button>
-        <button onclick="alert('Terima kasih, jaga kesehatan mental Anda 💙')" class="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">Selesai</button>
+    <!-- HASIL -->
+    <div id="result" class="hidden mt-12 text-center bg-white shadow-lg rounded-xl p-8 border border-gray-200">
+      <div id="icon" class="text-6xl mb-4"></div>
+      <h3 id="score" class="text-xl font-bold mb-2"></h3>
+      <p id="explanation" class="mb-4"></p>
+      <p id="advice" class="italic text-gray-600 mb-6"></p>
+      <div class="flex justify-center space-x-4">
+        <button onclick="location.reload()" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Isi Ulang</button>
+        <button onclick="window.close()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">Selesai</button>
       </div>
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-gray-100 border-t mt-10">
-    <div class="max-w-5xl mx-auto px-6 py-4 text-center text-gray-600 text-sm">
-      © 2025 Skrining Depresi - Bukan pengganti diagnosis profesional. Jika Anda merasa sangat tertekan, segera hubungi tenaga kesehatan.
+  <!-- FOOTER -->
+  <footer class="bg-blue-900 text-white py-6 mt-10">
+    <div class="max-w-5xl mx-auto px-6 text-center text-sm">
+      <p>&copy; 2025 Deteksi Depresi. Semua Hak Dilindungi.</p>
+      <p class="mt-1">Website ini hanya untuk edukasi, bukan diagnosis medis profesional.</p>
     </div>
   </footer>
 
   <script>
-    const questions = [
-      "Kurang minat atau kesenangan dalam melakukan sesuatu?",
-      "Merasa murung, depresi, atau putus asa?",
-      "Kesulitan tidur, tetap tidur, atau tidur berlebihan?",
-      "Merasa lelah atau kurang energi?",
-      "Kurang nafsu makan atau makan berlebihan?",
-      "Merasa buruk tentang diri sendiri — atau merasa gagal?",
-      "Kesulitan berkonsentrasi pada hal-hal, seperti membaca koran atau menonton TV?",
-      "Bergerak atau berbicara sangat lambat atau terlalu gelisah?",
-      "Pikiran lebih baik mati atau melukai diri sendiri?"
-    ];
+  const form = document.getElementById("quizForm");
+  const resultDiv = document.getElementById("result");
+  const scoreText = document.getElementById("score");
+  const explanation = document.getElementById("explanation");
+  const advice = document.getElementById("advice");
+  const icon = document.getElementById("icon");
 
-    const answers = [
-      "Tidak sama sekali",
-      "Beberapa hari",
-      "Lebih dari separuh hari",
-      "Hampir setiap hari"
-    ];
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    let score = 0;
+    const data = new FormData(form);
+    for (let val of data.values()) {
+      score += parseInt(val);
+    }
 
-    const motivationTexts = {
-      none: "🌟 Kamu sudah melakukan yang terbaik. Jaga pola hidup sehat dan terus tersenyum.",
-      mild: "✨ Perjalanan hidup memang naik turun. Kamu kuat, teruslah berproses dan hargai setiap langkah kecilmu.",
-      moderate: "🌈 Ingat, badai pasti berlalu. Jangan ragu mencari dukungan, kamu tidak sendirian.",
-      moderately_severe: "💪 Kamu sudah hebat bisa bertahan sejauh ini. Cari bantuan, ada banyak orang yang peduli padamu.",
-      severe: "❤️ Hidupmu sangat berharga. Tolong segera hubungi orang terdekat atau tenaga profesional. Kamu tidak sendiri."
-    };
+    let status = "";
+    let msg = "";
+    let iconHTML = "";
+    let motivation = "";
 
-    const questionsDiv = document.getElementById("questions");
-    questions.forEach((q, i) => {
-      const qDiv = document.createElement("div");
-      qDiv.className = "space-y-2";
-      qDiv.innerHTML = `
-        <label class="font-medium">${i+1}. ${q}</label>
-        <div class="flex flex-col sm:flex-row gap-2">
-          ${answers.map((a, idx) => `
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="q${i}" value="${idx}" class="accent-indigo-600" required />
-              <span>${a}</span>
-            </label>
-          `).join("")}
-        </div>
-      `;
-      questionsDiv.appendChild(qDiv);
-    });
+    if (score <= 4) {
+      status = "Normal";
+      msg = "Anda tampaknya dalam kondisi emosional yang sehat. Tetap jaga kebiasaan positif!";
+      iconHTML = "😊";
+      motivation = "Terus jaga rutinitas sehat Anda, luangkan waktu untuk hal-hal yang Anda sukai. Hidup Anda berarti dan berharga.";
+    } else if (score <= 9) {
+      status = "Depresi Ringan";
+      msg = "Anda mungkin sedang mengalami gejala ringan. Cobalah berbicara dengan orang dekat dan jaga pola hidup sehat.";
+      iconHTML = "🙂";
+      motivation = "Sedikit langkah kecil bisa membawa perubahan besar. Ingat, Anda tidak sendiri dan ada orang yang peduli.";
+    } else if (score <= 14) {
+      status = "Depresi Sedang";
+      msg = "Gejala cukup terasa. Jangan sungkan mencari bantuan profesional seperti psikolog.";
+      iconHTML = "😐";
+      motivation = "Tidak apa-apa merasa lelah. Mencari bantuan bukanlah tanda kelemahan, melainkan tanda keberanian.";
+    } else if (score <= 19) {
+      status = "Depresi Cukup Berat";
+      msg = "Kondisi ini perlu perhatian serius. Cari dukungan dari tenaga medis profesional.";
+      iconHTML = "😟";
+      motivation = "Hidup Anda berharga. Jangan biarkan rasa sakit ini menguasai segalanya — ada jalan untuk pulih dan orang yang siap mendukung.";
+    } else {
+      status = "Depresi Berat";
+      msg = "Sebaiknya segera mencari bantuan profesional. Anda tidak sendirian, ada banyak bantuan tersedia.";
+      iconHTML = "😔";
+      motivation = "Anda kuat karena masih bertahan sampai saat ini. Tolong jangan menghadapi ini sendirian — carilah bantuan sekarang juga.";
+    }
 
-    document.getElementById("quizForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+    resultDiv.classList.remove("hidden");
+    scoreText.textContent = `Hasil: ${status} (Skor: ${score})`;
+    explanation.textContent = msg;
+    advice.textContent = motivation;
+    icon.textContent = iconHTML;
 
-      let score = 0;
-      questions.forEach((_, i) => {
-        score += parseInt(document.querySelector(`input[name="q${i}"]:checked`).value);
-      });
+    window.scrollTo({ top: resultDiv.offsetTop - 100, behavior: 'smooth' });
+  });
+</script>
 
-      let title = "";
-      let desc = "";
-      let advice = "";
-      let icon = "";
-      let motivation = "";
-      let colorClass = "";
-      let barColor = "";
-
-      if (score <= 4) {
-        title = "Tidak ada depresi";
-        desc = "Gejala depresi tidak terlihat signifikan.";
-        advice = "Tetap jaga gaya hidup sehat dan terus terhubung dengan orang-orang terdekat.";
-        icon = "😊";
-        motivation = motivationTexts.none;
-        colorClass = "bg-green-50";
-        barColor = "bg-green-500";
-      } else if (score <= 9) {
-        title = "Depresi ringan";
-        desc = "Terdapat beberapa gejala depresi.";
-        advice = "Cobalah teknik relaksasi, olahraga, dan bicara dengan orang yang dipercaya.";
-        icon = "🙂";
-        motivation = motivationTexts.mild;
-        colorClass = "bg-yellow-50";
-        barColor = "bg-yellow-500";
-      } else if (score <= 14) {
-        title = "Depresi sedang";
-        desc = "Gejala depresi cukup terasa dan mungkin memengaruhi aktivitas sehari-hari.";
-        advice = "Pertimbangkan untuk berkonsultasi dengan psikolog atau konselor.";
-        icon = "😟";
-        motivation = motivationTexts.moderate;
-        colorClass = "bg-orange-50";
-        barColor = "bg-orange-500";
-      } else if (score <= 19) {
-        title = "Depresi cukup berat";
-        desc = "Gejala depresi cukup mengganggu kehidupan Anda.";
-        advice = "Disarankan segera mencari bantuan tenaga kesehatan profesional.";
-        icon = "😢";
-        motivation = motivationTexts.moderately_severe;
-        colorClass = "bg-red-50";
-        barColor = "bg-red-500";
-      } else {
-        title = "Depresi berat";
-        desc = "Gejala depresi sangat serius.";
-        advice = "Segera hubungi psikolog/psikiater atau layanan darurat bila merasa tidak aman.";
-        icon = "💔";
-        motivation = motivationTexts.severe;
-        colorClass = "bg-red-100";
-        barColor = "bg-red-600";
-      }
-
-      document.getElementById("form-section").classList.add("hidden");
-      const result = document.getElementById("result-section");
-      result.className = `mt-8 p-6 rounded-2xl shadow-md text-center fade-in ${colorClass}`;
-      document.getElementById("result-title").textContent = title;
-      document.getElementById("result-desc").textContent = desc;
-      document.getElementById("result-advice").textContent = advice;
-      document.getElementById("result-motivation").textContent = motivation;
-      document.getElementById("icon").innerHTML = `<div class="text-6xl">${icon}</div>`;
-
-      // Progress bar update
-      const percent = (score / 27) * 100;
-      const bar = document.getElementById("progress-bar");
-      bar.style.width = percent + "%";
-      bar.className = `h-4 rounded-full transition-all duration-700 ${barColor}`;
-      document.getElementById("result-score").textContent = `Skor Anda: ${score} dari 27`;
-
-      result.classList.remove("hidden");
-    });
-  </script>
 </body>
 </html>
