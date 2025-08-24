@@ -1,346 +1,166 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Diagnosa Kerusakan HP — Fuzzy Logic</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnosa Kerusakan Laptop - Fuzzy Logic</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <meta name="description" content="Aplikasi web sederhana untuk diagnosa kerusakan HP menggunakan logika fuzzy (Mamdani)." />
 </head>
-<body class="bg-slate-50 text-slate-800">
-  <!-- HEADER -->
-  <header class="sticky top-0 z-40 backdrop-blur bg-white/70 border-b border-slate-200">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white font-bold">FL</div>
-        <div>
-          <h1 class="text-xl font-semibold">Diagnosa Kerusakan HP</h1>
-          <p class="text-sm text-slate-500">Berbasis Logika Fuzzy (Mamdani)</p>
-        </div>
-      </div>
-      <a href="#tentang" class="text-sm text-emerald-700 hover:underline">Tentang</a>
-    </div>
+<body class="bg-gray-50 font-sans text-gray-800">
+  <header class="bg-indigo-600 text-white p-4 text-center shadow">
+    <h1 class="text-2xl font-bold">Diagnosa Kerusakan Laptop</h1>
+    <p class="text-sm">Berbasis Logika Fuzzy</p>
   </header>
 
-  <!-- MAIN -->
-  <main class="max-w-5xl mx-auto px-4 py-8">
-    <div class="grid md:grid-cols-5 gap-6">
-      <!-- FORM -->
-      <section class="md:col-span-3">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-          <h2 class="text-lg font-semibold mb-1">Input Gejala & Parameter</h2>
-          <p class="text-sm text-slate-500 mb-6">Isi nilai berikut sesuai kondisi HP untuk memperoleh analisis fuzzy.</p>
-
-          <div class="space-y-6">
-            <!-- Suhu Perangkat -->
-            <div>
-              <label class="flex items-center justify-between">
-                <span class="font-medium">Suhu perangkat (°C)</span>
-                <span id="valTemp" class="text-sm text-slate-500">35</span>
-              </label>
-              <input id="inpTemp" type="range" min="20" max="60" step="1" value="35" class="w-full accent-emerald-600" />
-              <p class="text-xs text-slate-500 mt-1">Umumnya performa optimal sekitar 16–35°C; di atas ~40–45°C berisiko overheat.</p>
-            </div>
-
-            <!-- Kesehatan Baterai -->
-            <div>
-              <label class="flex items-center justify-between">
-                <span class="font-medium">Kesehatan baterai (% kapasitas asli)</span>
-                <span id="valHealth" class="text-sm text-slate-500">90%</span>
-              </label>
-              <input id="inpHealth" type="range" min="50" max="100" step="1" value="90" class="w-full accent-emerald-600" />
-              <p class="text-xs text-slate-500 mt-1">Di bawah ~80% umumnya mulai terasa penurunan durasi dan disarankan ganti.</p>
-            </div>
-
-            <!-- Sisa Penyimpanan -->
-            <div>
-              <label class="flex items-center justify-between">
-                <span class="font-medium">Sisa penyimpanan internal (% bebas)</span>
-                <span id="valStorage" class="text-sm text-slate-500">20%</span>
-              </label>
-              <input id="inpStorage" type="range" min="0" max="50" step="1" value="20" class="w-full accent-emerald-600" />
-              <p class="text-xs text-slate-500 mt-1">Android memicu status "low storage" sekitar 5% atau ~500MB; jaga &gt;10–15% agar lancar.</p>
-            </div>
-
-            <!-- Reboot/Crash -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="flex items-center justify-between">
-                  <span class="font-medium">Jumlah reboot / hari</span>
-                  <span id="valReboot" class="text-sm text-slate-500">0</span>
-                </label>
-                <input id="inpReboot" type="range" min="0" max="10" step="1" value="0" class="w-full accent-emerald-600" />
-              </div>
-              <div>
-                <label class="flex items-center justify-between">
-                  <span class="font-medium">Crash aplikasi / hari</span>
-                  <span id="valCrash" class="text-sm text-slate-500">0</span>
-                </label>
-                <input id="inpCrash" type="range" min="0" max="20" step="1" value="0" class="w-full accent-emerald-600" />
-              </div>
-            </div>
-
-            <!-- Umur Perangkat (opsional) -->
-            <div>
-              <label class="flex items-center justify-between">
-                <span class="font-medium">Umur perangkat (tahun)</span>
-                <span id="valAge" class="text-sm text-slate-500">2.0</span>
-              </label>
-              <input id="inpAge" type="range" min="0" max="7" step="0.1" value="2.0" class="w-full accent-emerald-600" />
-            </div>
-
-            <div class="flex items-center gap-3 pt-2">
-              <button id="btnAnalyze" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 shadow-sm">Analisis Sekarang</button>
-              <button id="btnReset" class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-50">Reset</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- OUTPUT -->
-      <section class="md:col-span-2">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-          <h2 class="text-lg font-semibold mb-1">Hasil Analisis</h2>
-          <p class="text-sm text-slate-500 mb-4">Skor kemungkinan penyebab (0–100) & rekomendasi.</p>
-
-          <div id="scores" class="space-y-3"></div>
-          <div class="my-5 h-px bg-slate-200"></div>
-          <div id="recommendations" class="space-y-3"></div>
-        </div>
-      </section>
-    </div>
-
-    <!-- TENTANG & METODOLOGI -->
-    <section id="tentang" class="mt-10">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h3 class="text-lg font-semibold">Tentang Model Fuzzy</h3>
-        <p class="text-sm text-slate-600 mt-2">Model ini menggunakan <span class="font-medium">Mamdani Fuzzy Inference</span> dengan fungsi keanggotaan segitiga/trapesium. Input: suhu, kesehatan baterai, sisa penyimpanan, reboot, crash, dan umur. Output: skor kemungkinan empat kategori masalah — <em>Thermal</em>, <em>Baterai</em>, <em>Penyimpanan</em>, dan <em>Software</em>. Defuzzifikasi menggunakan pusat massa (centroid) pada skala 0–100 (semakin tinggi, semakin mungkin).</p>
-        <p class="text-xs text-slate-500 mt-3">Catatan: Hasil ini indikatif, bukan pengganti pemeriksaan teknisi. Parameter didasarkan pada pedoman pabrikan & praktik umum yang dipublikasikan (lihat dokumentasi proyek untuk referensi).</p>
+  <main class="max-w-5xl mx-auto mt-8 p-6 bg-white shadow rounded-xl">
+    <h2 class="text-xl font-semibold mb-4">Masukkan Data Laptop</h2>
+    <form id="fuzzyForm" class="space-y-4">
+      <div>
+        <label class="block mb-1 font-medium">Nama Laptop</label>
+        <input type="text" id="namaLaptop" class="w-full border p-2 rounded" placeholder="Contoh: Asus Vivobook">
       </div>
-    </section>
+      <div>
+        <label class="block mb-1 font-medium">Model / Seri</label>
+        <input type="text" id="seriLaptop" class="w-full border p-2 rounded" placeholder="Contoh: X415EA">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">Suhu CPU/GPU (°C)</label>
+        <input type="number" id="suhu" min="20" max="120" value="40" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">Penggunaan CPU (%)</label>
+        <input type="number" id="cpu" min="0" max="100" value="20" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">Penggunaan RAM (%)</label>
+        <input type="number" id="ram" min="0" max="100" value="30" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">Ruang Kosong Penyimpanan (%)</label>
+        <input type="number" id="disk" min="0" max="100" value="50" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">SMART (Reallocated Sectors)</label>
+        <input type="number" id="smart" min="0" value="0" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">Kesehatan Baterai (%)</label>
+        <input type="number" id="baterai" min="0" max="100" value="90" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">Jumlah Siklus Baterai</label>
+        <input type="number" id="siklus" min="0" value="200" class="w-full border p-2 rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">Adaptor / LED / Kipas / Beep Code</label>
+        <input type="text" id="statusTambahan" class="w-full border p-2 rounded" placeholder="Contoh: LED tidak menyala, beep 3x">
+      </div>
+      <div>
+        <button type="button" onclick="analisis()" class="bg-indigo-600 text-white px-4 py-2 rounded shadow">Analisis Sekarang</button>
+      </div>
+    </form>
+
+    <div id="hasil" class="mt-8 hidden">
+      <h2 class="text-xl font-semibold mb-4">Hasil Analisis</h2>
+      <p class="mb-2"><strong>Laptop:</strong> <span id="outNama"></span> (<span id="outSeri"></span>)</p>
+      <div id="scoreArea" class="space-y-3"></div>
+      <div class="mt-4 p-4 border rounded bg-gray-50">
+        <h3 class="font-semibold mb-2">Rekomendasi:</h3>
+        <ul id="rekomendasi" class="list-disc pl-5 text-sm"></ul>
+      </div>
+      <div class="mt-4 p-4 border rounded bg-gray-50">
+        <h3 class="font-semibold mb-2">Output Spesifik:</h3>
+        <p id="spesifik" class="text-sm text-gray-700"></p>
+      </div>
+    </div>
   </main>
 
-  <footer class="mt-10 border-t border-slate-200">
-    <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-slate-500">
-      © 2025 Fuzzy PhoneDiag. Dibuat untuk demonstrasi edukasi.
-    </div>
+  <footer class="text-center text-gray-600 text-sm py-4 mt-8">
+    &copy; 2025 Diagnosa Laptop Fuzzy - Dibuat dengan Tailwind
   </footer>
 
   <script>
-    // ---------- UTIL ----------
-    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-    const tri = (x, a, b, c) => x <= a || x >= c ? 0 : (x === b ? 1 : (x < b ? (x - a) / (b - a) : (c - x) / (c - b)));
-    const trap = (x, a, b, c, d) => x <= a || x >= d ? 0 : (x >= b && x <= c ? 1 : (x < b ? (x - a) / (b - a) : (d - x) / (d - c)));
+    function analisis() {
+      const nama = document.getElementById('namaLaptop').value || '-';
+      const seri = document.getElementById('seriLaptop').value || '-';
+      const suhu = parseFloat(document.getElementById('suhu').value);
+      const cpu = parseFloat(document.getElementById('cpu').value);
+      const ram = parseFloat(document.getElementById('ram').value);
+      const disk = parseFloat(document.getElementById('disk').value);
+      const smart = parseFloat(document.getElementById('smart').value);
+      const baterai = parseFloat(document.getElementById('baterai').value);
+      const siklus = parseFloat(document.getElementById('siklus').value);
+      const tambahan = document.getElementById('statusTambahan').value;
 
-    // ---------- MEMBERSHIP FUNCTIONS (informed by public guidance) ----------
-    const mf = {
-      temp: {
-        cool: (t) => trap(t, 0, 0, 28, 32),       // ≤28 sangat dingin → 0-32 transisi
-        warm: (t) => tri(t, 30, 36, 40),          // sekitar 30–40, puncak 36
-        hot:  (t) => trap(t, 38, 42, 60, 60),     // ≥42 sangat panas; aktif dari ~38
-      },
-      health: {
-        low:    (h) => trap(h, 0, 0, 75, 80),     // <80% dianggap menurun
-        medium: (h) => tri(h, 75, 85, 92),
-        high:   (h) => trap(h, 90, 95, 100, 100),
-      },
-      storage: {
-        low:    (p) => trap(p, 0, 0, 5, 10),      // 0–5% sangat rendah; 10% ambang aman
-        medium: (p) => tri(p, 5, 12, 20),
-        high:   (p) => trap(p, 15, 20, 50, 50),
-      },
-      reboot: {
-        none:  (r) => trap(r, -1, 0, 0, 1),
-        some:  (r) => tri(r, 0, 2, 4),
-        many:  (r) => trap(r, 3, 5, 10, 10),
-      },
-      crash: {
-        few:   (c) => trap(c, -1, 0, 0, 2),
-        some:  (c) => tri(c, 1, 4, 8),
-        many:  (c) => trap(c, 6, 10, 20, 20),
-      },
-      age: {
-        new:   (y) => trap(y, -1, 0, 0.8, 1.5),
-        mid:   (y) => tri(y, 1, 2.5, 4),
-        old:   (y) => trap(y, 3.5, 5, 7, 7),
-      }
-    };
-
-    // ---------- RULES ----------
-    // Output linguistic values mapped to numeric scale 0..100 via centroid of clipped trapezoids
-    // For each category we build activation (max of rule strengths), then defuzzify over 0..100
-
-    function rules(inputs) {
-      const { t, h, s, r, c, y } = inputs;
-      // Fuzzify
-      const T = { cool: mf.temp.cool(t), warm: mf.temp.warm(t), hot: mf.temp.hot(t) };
-      const H = { low: mf.health.low(h), medium: mf.health.medium(h), high: mf.health.high(h) };
-      const S = { low: mf.storage.low(s), medium: mf.storage.medium(s), high: mf.storage.high(s) };
-      const R = { none: mf.reboot.none(r), some: mf.reboot.some(r), many: mf.reboot.many(r) };
-      const C = { few: mf.crash.few(c), some: mf.crash.some(c), many: mf.crash.many(c) };
-      const Y = { new: mf.age.new(y), mid: mf.age.mid(y), old: mf.age.old(y) };
-
-      // Helper: min for AND, max for OR
-      const AND = Math.min, OR = Math.max;
-
-      // Category activations
-      const act = { thermal: 0, battery: 0, storage: 0, software: 0 };
-
-      // Thermal-related rules
-      act.thermal = OR(
-        act.thermal,
-        AND(T.hot, OR(R.some, C.some))
-      );
-      act.thermal = OR(act.thermal, T.hot);
-      act.thermal = OR(act.thermal, AND(T.warm, AND(R.some, C.some)));
-
-      // Battery-related rules
-      act.battery = OR(act.battery, AND(H.low, OR(T.hot, R.some)));
-      act.battery = OR(act.battery, AND(H.low, Y.old));
-      act.battery = OR(act.battery, AND(H.medium, R.many));
-
-      // Storage-related rules
-      act.storage = OR(act.storage, S.low);
-      act.storage = OR(act.storage, AND(S.medium, C.many));
-      act.storage = OR(act.storage, AND(S.low, R.some));
-
-      // Software-related rules
-      act.software = OR(act.software, AND(C.many, S.high));
-      act.software = OR(act.software, AND(R.many, S.high));
-      act.software = OR(act.software, AND(C.some, AND(T.cool, H.high)));
-
-      // Defuzzify: map activation α to centroid of trapezoid over [0..100]
-      const defuzz = (alpha) => alpha * 100; // linear mapping (simplified centroid for demo)
-
-      // Scores 0..100
-      return {
-        thermal: clamp(defuzz(act.thermal), 0, 100),
-        battery: clamp(defuzz(act.battery), 0, 100),
-        storage: clamp(defuzz(act.storage), 0, 100),
-        software: clamp(defuzz(act.software), 0, 100),
-        degrees: { T, H, S, R, C, Y }
+      let hasil = {
+        matiTotal: 0,
+        motherboard: 0,
+        thermal: 0,
+        bateraiRusak: 0,
+        lemot: 0,
+        storage: 0,
+        ramRusak: 0,
+        software: 0
       };
+
+      // logika fuzzy sederhana
+      if (suhu > 85) hasil.thermal += 80;
+      else if (suhu > 70) hasil.thermal += 50;
+
+      if (cpu > 90 || ram > 90) hasil.lemot += 70;
+      else if (cpu > 70 || ram > 70) hasil.lemot += 40;
+
+      if (disk < 10) hasil.storage += 80;
+      else if (disk < 20) hasil.storage += 50;
+
+      if (smart > 10) hasil.storage += 70;
+
+      if (baterai < 60 || siklus > 800) hasil.bateraiRusak += 70;
+      else if (baterai < 80 || siklus > 500) hasil.bateraiRusak += 40;
+
+      if (tambahan.toLowerCase().includes('tidak menyala') || tambahan.toLowerCase().includes('beep')) hasil.matiTotal += 90;
+      if (tambahan.toLowerCase().includes('led tidak menyala')) hasil.motherboard += 70;
+
+      // tampilkan hasil
+      document.getElementById('outNama').innerText = nama;
+      document.getElementById('outSeri').innerText = seri;
+
+      const area = document.getElementById('scoreArea');
+      area.innerHTML = '';
+      for (const [key, val] of Object.entries(hasil)) {
+        area.innerHTML += `
+          <div>
+            <p class="font-medium capitalize">${key.replace(/([A-Z])/g, ' $1')}</p>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+              <div class="bg-indigo-600 h-4 rounded-full" style="width: ${Math.min(val,100)}%"></div>
+            </div>
+            <p class="text-xs text-gray-600">Skor: ${val}</p>
+          </div>`;
+      }
+
+      // rekomendasi
+      const rekom = document.getElementById('rekomendasi');
+      rekom.innerHTML = '';
+      if (hasil.thermal > 60) rekom.innerHTML += '<li>Bersihkan kipas & ganti thermal paste</li>';
+      if (hasil.bateraiRusak > 60) rekom.innerHTML += '<li>Pertimbangkan ganti baterai</li>';
+      if (hasil.storage > 60) rekom.innerHTML += '<li>Backup data dan cek kesehatan HDD/SSD</li>';
+      if (hasil.lemot > 60) rekom.innerHTML += '<li>Upgrade RAM atau optimasi software</li>';
+      if (hasil.matiTotal > 60) rekom.innerHTML += '<li>Cek adaptor, motherboard, bawa ke service</li>';
+      if (rekom.innerHTML === '') rekom.innerHTML = '<li>Kondisi relatif normal</li>';
+
+      // output spesifik
+      let outSpesifik = '';
+      if (hasil.matiTotal > 80) outSpesifik = 'Kemungkinan besar laptop tidak dapat dinyalakan karena kegagalan hardware utama (motherboard atau power supply).';
+      else if (hasil.thermal > 70) outSpesifik = 'Laptop mengalami overheating, potensi kerusakan ada pada kipas atau sistem pendingin.';
+      else if (hasil.bateraiRusak > 60) outSpesifik = 'Baterai cepat habis atau rusak, siklus tinggi atau kapasitas sudah turun drastis.';
+      else if (hasil.storage > 60) outSpesifik = 'Penyimpanan bermasalah, kemungkinan bad sector atau penuh sehingga sistem melambat.';
+      else if (hasil.lemot > 60) outSpesifik = 'Laptop lemot akibat penggunaan CPU/RAM tinggi atau software berat.';
+      else outSpesifik = 'Tidak ada indikasi kerusakan serius terdeteksi.';
+
+      document.getElementById('spesifik').innerText = outSpesifik;
+
+      document.getElementById('hasil').classList.remove('hidden');
     }
-
-    // ---------- RECOMMENDATIONS ----------
-    function getRecommendations(scores, inputs) {
-      const adv = [];
-      // Thermal
-      if (scores.thermal > 40) {
-        adv.push({
-          title: 'Masalah Thermal Terindikasi',
-          desc: 'Kurangi beban kerja, hindari sinar matahari langsung, lepas casing tebal saat bermain gim/charging, dan beri jeda dinginkan. Bila sering shutdown karena panas, periksa di service center.'
-        });
-      }
-      // Battery
-      if (scores.battery > 40) {
-        adv.push({
-          title: 'Baterai Melemah',
-          desc: 'Jika kesehatan < 80%, pertimbangkan ganti baterai. Jaga pengisian di kisaran ~20–80%, hindari panas saat charging.'
-        });
-      }
-      // Storage
-      if (scores.storage > 40) {
-        adv.push({
-          title: 'Penyimpanan Rendah',
-          desc: 'Kosongkan ruang hingga >15%: hapus cache besar, pindahkan foto/video ke cloud/SD card, copot aplikasi jarang dipakai.'
-        });
-      }
-      // Software
-      if (scores.software > 40) {
-        adv.push({
-          title: 'Kemungkinan Masalah Software',
-          desc: 'Perbarui sistem & aplikasi, cek aplikasi bermasalah, lakukan reset pabrik (setelah backup) bila crash tetap sering.'
-        });
-      }
-      if (adv.length === 0) {
-        adv.push({ title: 'Kondisi Umumnya Normal', desc: 'Parameter saat ini belum menunjukkan masalah signifikan. Tetap pantau suhu, kesehatan baterai, dan ruang penyimpanan.' });
-      }
-      return adv;
-    }
-
-    // ---------- UI BINDINGS ----------
-    const inpTemp = document.getElementById('inpTemp');
-    const inpHealth = document.getElementById('inpHealth');
-    const inpStorage = document.getElementById('inpStorage');
-    const inpReboot = document.getElementById('inpReboot');
-    const inpCrash = document.getElementById('inpCrash');
-    const inpAge = document.getElementById('inpAge');
-
-    const outTemp = document.getElementById('valTemp');
-    const outHealth = document.getElementById('valHealth');
-    const outStorage = document.getElementById('valStorage');
-    const outReboot = document.getElementById('valReboot');
-    const outCrash = document.getElementById('valCrash');
-    const outAge = document.getElementById('valAge');
-
-    const scoresDiv = document.getElementById('scores');
-    const recDiv = document.getElementById('recommendations');
-
-    const syncLabels = () => {
-      outTemp.textContent = inpTemp.value;
-      outHealth.textContent = inpHealth.value + '%';
-      outStorage.textContent = inpStorage.value + '%';
-      outReboot.textContent = inpReboot.value;
-      outCrash.textContent = inpCrash.value;
-      outAge.textContent = Number(inpAge.value).toFixed(1);
-    };
-    ['input', 'change'].forEach(ev => {
-      inpTemp.addEventListener(ev, syncLabels);
-      inpHealth.addEventListener(ev, syncLabels);
-      inpStorage.addEventListener(ev, syncLabels);
-      inpReboot.addEventListener(ev, syncLabels);
-      inpCrash.addEventListener(ev, syncLabels);
-      inpAge.addEventListener(ev, syncLabels);
-    });
-    syncLabels();
-
-    function render() {
-      const inputs = {
-        t: +inpTemp.value,
-        h: +inpHealth.value,
-        s: +inpStorage.value,
-        r: +inpReboot.value,
-        c: +inpCrash.value,
-        y: +inpAge.value
-      };
-      const sc = rules(inputs);
-
-      const entries = [
-        { key: 'thermal', label: 'Thermal/Overheat', value: sc.thermal },
-        { key: 'battery', label: 'Baterai Melemah', value: sc.battery },
-        { key: 'storage', label: 'Penyimpanan Rendah', value: sc.storage },
-        { key: 'software', label: 'Gangguan Software', value: sc.software },
-      ];
-
-      scoresDiv.innerHTML = entries.map(e => `
-        <div class="">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-sm">${e.label}</span>
-            <span class="text-sm font-medium">${e.value.toFixed(0)}</span>
-          </div>
-          <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-            <div class="h-2 bg-emerald-500" style="width:${clamp(e.value,0,100)}%"></div>
-          </div>
-        </div>
-      `).join('');
-
-      const advs = getRecommendations(sc, inputs);
-      recDiv.innerHTML = advs.map(a => `
-        <div class="p-4 border border-slate-200 rounded-xl bg-emerald-50/50">
-          <div class="font-medium text-emerald-800">${a.title}</div>
-          <div class="text-sm text-slate-600">${a.desc}</div>
-        </div>
-      `).join('');
-    }
-
-    document.getElementById('btnAnalyze').addEventListener('click', render);
-    document.getElementById('btnReset').addEventListener('click', () => {
-      inpTemp.value = 35; inpHealth.value = 90; inpStorage.value = 20; inpReboot.value = 0; inpCrash.value = 0; inpAge.value = 2.0; syncLabels(); scoresDiv.innerHTML = ''; recDiv.innerHTML = '';
-    });
-
-    // Auto-run once on load for a preview
-    render();
   </script>
 </body>
 </html>
