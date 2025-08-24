@@ -8,10 +8,13 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide-react@latest/dist/lucide.min.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-  <div id="root" class="w-full max-w-2xl"></div>
+<body class="bg-gradient-to-r from-blue-50 to-blue-100 min-h-screen flex items-center justify-center p-6">
+  <div id="root" class="w-full max-w-3xl"></div>
   <script type="text/babel">
+    const { Smile, Meh, Frown, AlertTriangle, AlertOctagon } = lucide;
+
     const questions = [
       "Sedikit minat atau kesenangan dalam melakukan hal-hal",
       "Merasa murung, depresi, atau putus asa",
@@ -32,11 +35,11 @@
     ];
 
     function classifyScore(total) {
-      if (total <= 4) return { level: "Minimal", desc: "Kemungkinan tidak ada depresi klinis. Tetap jaga kesehatan mental dan fisik." };
-      if (total <= 9) return { level: "Ringan", desc: "Terdapat gejala ringan. Coba lakukan aktivitas menyenangkan, olahraga ringan, tidur cukup, dan curhat ke orang terdekat." };
-      if (total <= 14) return { level: "Sedang", desc: "Ada indikasi depresi sedang. Disarankan konsultasi dengan tenaga kesehatan atau psikolog untuk dukungan lebih lanjut." };
-      if (total <= 19) return { level: "Sedang Berat", desc: "Gejala cukup signifikan. Penting mencari bantuan profesional segera untuk evaluasi lebih mendalam." };
-      return { level: "Berat", desc: "Gejala sangat serius. Segera hubungi psikolog/psikiater. Jika ada pikiran untuk menyakiti diri, segera hubungi layanan darurat atau orang terdekat." };
+      if (total <= 4) return { level: "Minimal", desc: "Kemungkinan tidak ada depresi klinis. Tetap jaga kesehatan mental dan fisik.", icon: <Smile className="w-10 h-10 text-green-500 mx-auto"/> };
+      if (total <= 9) return { level: "Ringan", desc: "Terdapat gejala ringan. Coba lakukan aktivitas menyenangkan, olahraga ringan, tidur cukup, dan curhat ke orang terdekat.", icon: <Meh className="w-10 h-10 text-yellow-500 mx-auto"/> };
+      if (total <= 14) return { level: "Sedang", desc: "Ada indikasi depresi sedang. Disarankan konsultasi dengan tenaga kesehatan atau psikolog untuk dukungan lebih lanjut.", icon: <Frown className="w-10 h-10 text-orange-500 mx-auto"/> };
+      if (total <= 19) return { level: "Sedang Berat", desc: "Gejala cukup signifikan. Penting mencari bantuan profesional segera untuk evaluasi lebih mendalam.", icon: <AlertTriangle className="w-10 h-10 text-red-500 mx-auto"/> };
+      return { level: "Berat", desc: "Gejala sangat serius. Segera hubungi psikolog/psikiater. Jika ada pikiran untuk menyakiti diri, segera hubungi layanan darurat atau orang terdekat.", icon: <AlertOctagon className="w-10 h-10 text-red-700 mx-auto"/> };
     }
 
     function App() {
@@ -60,19 +63,25 @@
         setSubmitted(true);
       }
 
+      function resetForm() {
+        setAnswers(Array(questions.length).fill(null));
+        setSubmitted(false);
+      }
+
       return (
-        <div className="bg-white shadow-lg rounded-2xl p-6">
-          <h1 className="text-2xl font-bold text-center mb-4">Skrining Depresi (PHQ-9)</h1>
+        <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-200">
+          <h1 className="text-3xl font-bold text-center mb-6 text-blue-700">Skrining Depresi (PHQ-9)</h1>
           {!submitted ? (
             <div>
               {questions.map((q, i) => (
-                <div key={i} className="mb-4">
+                <div key={i} className="mb-5">
                   <p className="font-medium mb-2">{i + 1}. {q}</p>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-4">
                     {options.map((opt) => (
-                      <label key={opt.value} className="flex items-center gap-2">
+                      <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
+                          className="accent-blue-600"
                           name={`q-${i}`}
                           value={opt.value}
                           checked={answers[i] === opt.value}
@@ -86,28 +95,37 @@
               ))}
               <button
                 onClick={handleSubmit}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg mt-4"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-lg font-medium transition"
               >
                 Lihat Hasil
               </button>
             </div>
           ) : (
             <div className="text-center">
-              <h2 className="text-xl font-semibold mb-2">Hasil Skrining</h2>
+              {classification.icon}
+              <h2 className="text-2xl font-semibold mb-2 mt-3">Hasil Skrining</h2>
               <p className="text-lg">Total Skor: <span className="font-bold">{total}</span></p>
-              <p className="mt-2 text-lg">Klasifikasi: <span className="font-bold">{classification.level}</span></p>
-              <p className="mt-3 text-gray-700">{classification.desc}</p>
+              <p className="mt-2 text-xl">Klasifikasi: <span className="font-bold text-blue-700">{classification.level}</span></p>
+              <p className="mt-4 text-gray-700 leading-relaxed">{classification.desc}</p>
               {answers[8] > 0 && (
-                <p className="mt-4 text-red-600 font-semibold">
+                <p className="mt-5 text-red-600 font-semibold text-lg">
                   ⚠️ Anda menandai adanya pikiran untuk menyakiti diri. Mohon segera cari bantuan profesional atau hubungi layanan darurat.
                 </p>
               )}
-              <button
-                onClick={() => setSubmitted(false)}
-                className="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg mt-6"
-              >
-                Isi Ulang Kuesioner
-              </button>
+              <div className="flex gap-4 mt-8 justify-center">
+                <button
+                  onClick={resetForm}
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg text-lg font-medium transition"
+                >
+                  Isi Lagi
+                </button>
+                <button
+                  onClick={() => alert('Terima kasih telah menggunakan skrining ini! Jaga kesehatan mental Anda.')}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-lg font-medium transition"
+                >
+                  Selesai
+                </button>
+              </div>
             </div>
           )}
         </div>
