@@ -3,161 +3,157 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Skrining Depresi (PHQ-9)</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Deteksi Depresi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide-react@latest/dist/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .fade-in {
+      animation: fadeIn 0.8s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-r from-blue-50 to-blue-100 min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
   <!-- Header -->
-  <header class="bg-blue-700 text-white shadow-lg">
-    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-2xl font-bold flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-3-3v6m9-6a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        Mental Health Check
-      </h1>
-      <span class="text-sm">Tes Skrining Depresi (PHQ-9)</span>
+  <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">💙 Skrining Depresi</h1>
+      <nav>
+        <a href="#" class="px-3 hover:text-gray-200">Beranda</a>
+        <a href="#" class="px-3 hover:text-gray-200">Tentang</a>
+        <a href="#" class="px-3 hover:text-gray-200">Kontak</a>
+      </nav>
     </div>
   </header>
 
-  <!-- Main -->
-  <main id="root" class="flex-1 w-full max-w-3xl mx-auto px-4 py-8"></main>
+  <!-- Main Content -->
+  <main class="flex-grow max-w-3xl mx-auto px-6 py-10">
+    <!-- Form -->
+    <div id="form-section" class="bg-white p-6 rounded-2xl shadow-md fade-in">
+      <h2 class="text-xl font-semibold mb-4 text-indigo-600">Kuesioner PHQ-9</h2>
+      <p class="mb-6 text-gray-600">Jawablah sesuai kondisi Anda selama <b>2 minggu terakhir</b>.</p>
+
+      <form id="quizForm" class="space-y-6">
+        <!-- Pertanyaan -->
+        <div id="questions"></div>
+
+        <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition">
+          Lihat Hasil
+        </button>
+      </form>
+    </div>
+
+    <!-- Hasil -->
+    <div id="result-section" class="hidden bg-white mt-8 p-6 rounded-2xl shadow-md text-center">
+      <div id="icon" class="flex justify-center mb-4"></div>
+      <h2 id="result-title" class="text-2xl font-bold mb-2"></h2>
+      <p id="result-desc" class="text-gray-700 mb-4"></p>
+      <p id="result-advice" class="text-indigo-600 font-medium mb-6"></p>
+      <div class="flex gap-4 justify-center">
+        <button onclick="location.reload()" class="px-6 py-2 bg-gray-200 rounded-xl hover:bg-gray-300">Isi Ulang</button>
+        <button onclick="alert('Terima kasih, jaga kesehatan mental Anda 💙')" class="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">Selesai</button>
+      </div>
+    </div>
+  </main>
 
   <!-- Footer -->
-  <footer class="bg-gray-100 border-t border-gray-200 mt-10">
-    <div class="max-w-5xl mx-auto px-6 py-6 text-center text-gray-600 text-sm leading-relaxed">
-      <p>⚠️ Hasil skrining ini <span class="font-semibold">bukan diagnosis resmi</span> medis. Jika hasil menunjukkan depresi sedang hingga berat, segera konsultasi dengan psikolog atau psikiater.</p>
-      <p class="mt-2">Jika Anda memiliki pikiran untuk menyakiti diri, segera hubungi <span class="font-semibold text-red-600">119</span> (darurat) atau layanan kesehatan terdekat.</p>
-      <p class="mt-4">&copy; 2025 Mental Health Check | Dibuat dengan ❤️ untuk kesadaran kesehatan mental</p>
+  <footer class="bg-gray-100 border-t mt-10">
+    <div class="max-w-5xl mx-auto px-6 py-4 text-center text-gray-600 text-sm">
+      © 2025 Skrining Depresi - Bukan pengganti diagnosis profesional. Jika Anda merasa sangat tertekan, segera hubungi tenaga kesehatan.
     </div>
   </footer>
 
-  <script type="text/babel">
-    const { Smile, Meh, Frown, AlertTriangle, AlertOctagon } = lucide;
-
+  <script>
     const questions = [
-      "Sedikit minat atau kesenangan dalam melakukan hal-hal",
-      "Merasa murung, depresi, atau putus asa",
-      "Kesulitan tidur atau terlalu banyak tidur",
-      "Merasa lelah atau kurang energi",
-      "Nafsu makan buruk atau makan berlebihan",
-      "Merasa buruk tentang diri sendiri — atau merasa gagal",
-      "Kesulitan berkonsentrasi pada sesuatu, misalnya membaca koran atau menonton televisi",
-      "Gerakan atau bicara sangat lambat sehingga orang lain memperhatikannya, atau sebaliknya — terlalu gelisah atau tidak bisa diam",
-      "Pikiran bahwa lebih baik mati atau menyakiti diri sendiri"
+      "Kurang minat atau kesenangan dalam melakukan sesuatu?",
+      "Merasa murung, depresi, atau putus asa?",
+      "Kesulitan tidur, tetap tidur, atau tidur berlebihan?",
+      "Merasa lelah atau kurang energi?",
+      "Kurang nafsu makan atau makan berlebihan?",
+      "Merasa buruk tentang diri sendiri — atau merasa gagal?",
+      "Kesulitan berkonsentrasi pada hal-hal, seperti membaca koran atau menonton TV?",
+      "Bergerak atau berbicara sangat lambat atau terlalu gelisah?",
+      "Pikiran lebih baik mati atau melukai diri sendiri?"
     ];
 
-    const options = [
-      { label: "Tidak sama sekali", value: 0 },
-      { label: "Beberapa hari", value: 1 },
-      { label: "Lebih dari setengah hari", value: 2 },
-      { label: "Hampir setiap hari", value: 3 }
+    const answers = [
+      "Tidak sama sekali",
+      "Beberapa hari",
+      "Lebih dari separuh hari",
+      "Hampir setiap hari"
     ];
 
-    function classifyScore(total) {
-      if (total <= 4) return { level: "Minimal", desc: "Kemungkinan tidak ada depresi klinis. Tetap jaga kesehatan mental dan fisik.", icon: <Smile className="w-10 h-10 text-green-500 mx-auto"/> };
-      if (total <= 9) return { level: "Ringan", desc: "Terdapat gejala ringan. Coba lakukan aktivitas menyenangkan, olahraga ringan, tidur cukup, dan curhat ke orang terdekat.", icon: <Meh className="w-10 h-10 text-yellow-500 mx-auto"/> };
-      if (total <= 14) return { level: "Sedang", desc: "Ada indikasi depresi sedang. Disarankan konsultasi dengan tenaga kesehatan atau psikolog untuk dukungan lebih lanjut.", icon: <Frown className="w-10 h-10 text-orange-500 mx-auto"/> };
-      if (total <= 19) return { level: "Sedang Berat", desc: "Gejala cukup signifikan. Penting mencari bantuan profesional segera untuk evaluasi lebih mendalam.", icon: <AlertTriangle className="w-10 h-10 text-red-500 mx-auto"/> };
-      return { level: "Berat", desc: "Gejala sangat serius. Segera hubungi psikolog/psikiater. Jika ada pikiran untuk menyakiti diri, segera hubungi layanan darurat atau orang terdekat.", icon: <AlertOctagon className="w-10 h-10 text-red-700 mx-auto"/> };
-    }
-
-    function App() {
-      const [answers, setAnswers] = React.useState(Array(questions.length).fill(null));
-      const [submitted, setSubmitted] = React.useState(false);
-
-      const total = answers.reduce((acc, val) => acc + (val ?? 0), 0);
-      const classification = classifyScore(total);
-
-      function handleChange(qIndex, value) {
-        const newAnswers = [...answers];
-        newAnswers[qIndex] = value;
-        setAnswers(newAnswers);
-      }
-
-      function handleSubmit() {
-        if (answers.includes(null)) {
-          alert("Harap isi semua pertanyaan.");
-          return;
-        }
-        setSubmitted(true);
-      }
-
-      function resetForm() {
-        setAnswers(Array(questions.length).fill(null));
-        setSubmitted(false);
-      }
-
-      return (
-        <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-200">
-          <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">Skrining Depresi (PHQ-9)</h2>
-          {!submitted ? (
-            <div>
-              {questions.map((q, i) => (
-                <div key={i} className="mb-5">
-                  <p className="font-medium mb-2">{i + 1}. {q}</p>
-                  <div className="flex flex-wrap gap-4">
-                    {options.map((opt) => (
-                      <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          className="accent-blue-600"
-                          name={`q-${i}`}
-                          value={opt.value}
-                          checked={answers[i] === opt.value}
-                          onChange={() => handleChange(i, opt.value)}
-                        />
-                        {opt.label}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <button
-                onClick={handleSubmit}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-lg font-medium transition"
-              >
-                Lihat Hasil
-              </button>
-            </div>
-          ) : (
-            <div className="text-center">
-              {classification.icon}
-              <h3 className="text-2xl font-semibold mb-2 mt-3">Hasil Skrining</h3>
-              <p className="text-lg">Total Skor: <span className="font-bold">{total}</span></p>
-              <p className="mt-2 text-xl">Klasifikasi: <span className="font-bold text-blue-700">{classification.level}</span></p>
-              <p className="mt-4 text-gray-700 leading-relaxed">{classification.desc}</p>
-              {answers[8] > 0 && (
-                <p className="mt-5 text-red-600 font-semibold text-lg">
-                  ⚠️ Anda menandai adanya pikiran untuk menyakiti diri. Mohon segera cari bantuan profesional atau hubungi layanan darurat.
-                </p>
-              )}
-              <div className="flex gap-4 mt-8 justify-center">
-                <button
-                  onClick={resetForm}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg text-lg font-medium transition"
-                >
-                  Isi Lagi
-                </button>
-                <button
-                  onClick={() => alert('Terima kasih telah menggunakan skrining ini! Jaga kesehatan mental Anda.')}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-lg font-medium transition"
-                >
-                  Selesai
-                </button>
-              </div>
-            </div>
-          )}
+    const questionsDiv = document.getElementById("questions");
+    questions.forEach((q, i) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "space-y-2";
+      qDiv.innerHTML = `
+        <label class="font-medium">${i+1}. ${q}</label>
+        <div class="flex flex-col sm:flex-row gap-2">
+          ${answers.map((a, idx) => `
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="q${i}" value="${idx}" class="accent-indigo-600" required />
+              <span>${a}</span>
+            </label>
+          `).join("")}
         </div>
-      );
-    }
+      `;
+      questionsDiv.appendChild(qDiv);
+    });
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      let score = 0;
+      questions.forEach((_, i) => {
+        score += parseInt(document.querySelector(`input[name="q${i}"]:checked`).value);
+      });
+
+      let title = "";
+      let desc = "";
+      let advice = "";
+      let icon = "";
+
+      if (score <= 4) {
+        title = "Tidak ada depresi";
+        desc = "Gejala depresi tidak terlihat signifikan.";
+        advice = "Tetap jaga gaya hidup sehat dan terus terhubung dengan orang-orang terdekat.";
+        icon = "😊";
+      } else if (score <= 9) {
+        title = "Depresi ringan";
+        desc = "Terdapat beberapa gejala depresi.";
+        advice = "Cobalah teknik relaksasi, olahraga, dan bicara dengan orang yang dipercaya.";
+        icon = "🙂";
+      } else if (score <= 14) {
+        title = "Depresi sedang";
+        desc = "Gejala depresi cukup terasa dan mungkin memengaruhi aktivitas sehari-hari.";
+        advice = "Pertimbangkan untuk berkonsultasi dengan psikolog atau konselor.";
+        icon = "😟";
+      } else if (score <= 19) {
+        title = "Depresi cukup berat";
+        desc = "Gejala depresi cukup mengganggu kehidupan Anda.";
+        advice = "Disarankan segera mencari bantuan tenaga kesehatan profesional.";
+        icon = "😢";
+      } else {
+        title = "Depresi berat";
+        desc = "Gejala depresi sangat serius.";
+        advice = "Segera hubungi psikolog/psikiater atau layanan darurat bila merasa tidak aman.";
+        icon = "💔";
+      }
+
+      document.getElementById("form-section").classList.add("hidden");
+      const result = document.getElementById("result-section");
+      result.classList.remove("hidden");
+      result.classList.add("fade-in");
+      document.getElementById("result-title").textContent = title;
+      document.getElementById("result-desc").textContent = desc;
+      document.getElementById("result-advice").textContent = advice;
+      document.getElementById("icon").innerHTML = `<div class="text-6xl">${icon}</div>`;
+    });
   </script>
 </body>
 </html>
