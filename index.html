@@ -1,184 +1,590 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diagnosa Kerusakan Laptop - Fuzzy Logic</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Diagnosa Kerusakan Laptop — Fuzzy Logic (Data-based)</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Diagnosa kerusakan laptop berbasis logika fuzzy — battery, storage SMART, thermal, performance, motherboard, display, GPU." />
 </head>
-<body class="bg-gray-50 font-sans text-gray-800">
-  <!-- HEADER -->
-  <header class="bg-green-600 text-white p-4 shadow-md">
-    <h1 class="text-2xl font-bold">Diagnosa Kerusakan Laptop (Logika Fuzzy)</h1>
-    <p class="text-sm">Masukkan parameter kondisi laptop untuk analisis otomatis</p>
+<body class="bg-slate-50 text-slate-800">
+  <header class="bg-indigo-700 text-white py-4 shadow">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold">Diagnosa Kerusakan Laptop</h1>
+          <p class="text-sm opacity-90">Sistem prototipe berbasis Logika Fuzzy — ambang & aturan disesuaikan dengan praktik teknis.</p>
+        </div>
+        <div class="text-xs opacity-90">© 2025 • FuzzyDiag</div>
+      </div>
+    </div>
   </header>
 
-  <!-- FORM -->
-  <main class="max-w-6xl mx-auto mt-6 p-6 bg-white shadow rounded-xl">
-    <h2 class="text-xl font-semibold mb-4">Masukkan Kondisi Laptop</h2>
-    <form id="diagnosaForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <label>
-        Nama Laptop
-        <input type="text" id="nama" class="w-full border p-2 rounded" required>
-      </label>
-      <label>
-        Model/Seri
-        <input type="text" id="model" class="w-full border p-2 rounded" required>
-      </label>
-      <label>
-        Suhu CPU/GPU (°C)
-        <input type="number" id="suhu" class="w-full border p-2 rounded" min="20" max="120" required>
-      </label>
-      <label>
-        Penggunaan CPU (%) 
-        <input type="number" id="cpu" class="w-full border p-2 rounded" min="0" max="100" required>
-      </label>
-      <label>
-        Penggunaan RAM (%) 
-        <input type="number" id="ram" class="w-full border p-2 rounded" min="0" max="100" required>
-      </label>
-      <label>
-        Sisa Penyimpanan (%) 
-        <input type="number" id="storage" class="w-full border p-2 rounded" min="0" max="100" required>
-      </label>
-      <label>
-        Kesehatan Baterai (%) 
-        <input type="number" id="baterai" class="w-full border p-2 rounded" min="0" max="100" required>
-      </label>
-      <label>
-        Jumlah Siklus Baterai 
-        <input type="number" id="siklus" class="w-full border p-2 rounded" min="0" max="2000" required>
-      </label>
-      <label>
-        Status LED/Adaptor/Kipas (0=tidak nyala, 1=nyala)
-        <input type="number" id="hardware" class="w-full border p-2 rounded" min="0" max="1" required>
-      </label>
-      <label>
-        SMART Reallocated Sectors (Storage Health) 
-        <input type="number" id="smart" class="w-full border p-2 rounded" min="0" max="1000" required>
-      </label>
-      <label>
-        Error GPU/VGA (0=normal, 1=artefak/driver crash)
-        <input type="number" id="gpu" class="w-full border p-2 rounded" min="0" max="1" required>
-      </label>
-      <label>
-        Error Layar (0=normal, 1=blank/garis)
-        <input type="number" id="layar" class="w-full border p-2 rounded" min="0" max="1" required>
-      </label>
-      <label>
-        Error Keyboard/Touchpad (0=normal, 1=error)
-        <input type="number" id="inputdev" class="w-full border p-2 rounded" min="0" max="1" required>
-      </label>
-      <label class="md:col-span-2">
-        Catatan Tambahan
-        <textarea id="catatan" class="w-full border p-2 rounded"></textarea>
-      </label>
-      <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Analisis Sekarang</button>
-    </form>
+  <main class="max-w-6xl mx-auto p-6">
+    <div class="grid lg:grid-cols-7 gap-6">
+      <!-- Form -->
+      <section class="lg:col-span-4 bg-white rounded-2xl shadow p-6">
+        <h2 class="text-lg font-semibold mb-3">Masukkan Data & Gejala</h2>
+        <p class="text-sm text-slate-500 mb-4">Isi nilai teknis bila tersedia (SMART data, suhu, health battery, dsb.). Gunakan nilai saat masalah muncul untuk hasil lebih akurat.</p>
+
+        <div class="space-y-4">
+          <div class="grid md:grid-cols-2 gap-3">
+            <input id="deviceName" placeholder="Nama laptop (opsional)" class="border rounded p-2" />
+            <input id="deviceModel" placeholder="Model / Seri (opsional)" class="border rounded p-2" />
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-3">
+            <label class="block">
+              <span class="text-sm font-medium">Suhu CPU (°C)</span>
+              <input id="cpuTemp" type="number" min="0" max="120" value="45" class="w-full border p-2 rounded mt-1" />
+              <span class="text-xs text-slate-400">Gunakan saat beban tinggi jika bisa</span>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium">Suhu Drive (°C) — SMART</span>
+              <input id="driveTemp" type="number" min="0" max="120" value="40" class="w-full border p-2 rounded mt-1" />
+              <span class="text-xs text-slate-400">Ideal: 36–47°C (lihat SMART)</span>
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-3">
+            <label>
+              <span class="text-sm font-medium">CPU Usage (%)</span>
+              <input id="cpuUsage" type="number" min="0" max="100" value="15" class="w-full border p-2 rounded mt-1" />
+            </label>
+            <label>
+              <span class="text-sm font-medium">RAM Usage (%)</span>
+              <input id="ramUsage" type="number" min="0" max="100" value="40" class="w-full border p-2 rounded mt-1" />
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-3">
+            <label>
+              <span class="text-sm font-medium">Ruang Kosong Drive Sistem (%)</span>
+              <input id="diskFree" type="number" min="0" max="100" value="30" class="w-full border p-2 rounded mt-1" />
+              <span class="text-xs text-slate-400">Safe >20%, Warn 10–20%, Critical <10%</span>
+            </label>
+
+            <label>
+              <span class="text-sm font-medium">SMART: Reallocated Sectors Count</span>
+              <input id="realloc" type="number" min="0" max="5000" value="0" class="w-full border p-2 rounded mt-1" />
+              <span class="text-xs text-slate-400">0 safe, 1–50 warning, >50 critical</span>
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-3">
+            <label>
+              <span class="text-sm font-medium">Kesehatan Baterai (%)</span>
+              <input id="batHealth" type="number" min="0" max="100" value="92" class="w-full border p-2 rounded mt-1" />
+            </label>
+
+            <label>
+              <span class="text-sm font-medium">Battery Cycles (jumlah)</span>
+              <input id="batCycles" type="number" min="0" max="5000" value="200" class="w-full border p-2 rounded mt-1" />
+              <span class="text-xs text-slate-400">Low <300, Med 300–500, High >500</span>
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-3">
+            <label>
+              <span class="text-sm font-medium">Adaptor terhubung?</span>
+              <select id="adapter" class="w-full border p-2 rounded mt-1">
+                <option value="1">Ya</option>
+                <option value="0">Tidak</option>
+              </select>
+            </label>
+
+            <label>
+              <span class="text-sm font-medium">LED indikator menyala?</span>
+              <select id="leds" class="w-full border p-2 rounded mt-1">
+                <option value="1">Ya</option>
+                <option value="0">Tidak</option>
+              </select>
+            </label>
+
+            <label>
+              <span class="text-sm font-medium">Kipas berputar?</span>
+              <select id="fans" class="w-full border p-2 rounded mt-1">
+                <option value="1">Ya</option>
+                <option value="0">Tidak</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-3">
+            <label>
+              <span class="text-sm font-medium">Layar blank / garis?</span>
+              <select id="screenErr" class="w-full border p-2 rounded mt-1">
+                <option value="0">Tidak</option>
+                <option value="1">Ya</option>
+              </select>
+            </label>
+
+            <label>
+              <span class="text-sm font-medium">GPU artefak / crash?</span>
+              <select id="gpuErr" class="w-full border p-2 rounded mt-1">
+                <option value="0">Tidak</option>
+                <option value="1">Ya</option>
+              </select>
+            </label>
+
+            <label>
+              <span class="text-sm font-medium">Beep code / POST?</span>
+              <select id="beep" class="w-full border p-2 rounded mt-1">
+                <option value="0">Tidak ada</option>
+                <option value="1">Beep tunggal</option>
+                <option value="2">Beep berganda / berulang</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            <span class="text-sm font-medium">Catatan singkat</span>
+            <input id="notes" placeholder="mis. bau gosong, shutdown mendadak, dsb." class="w-full border p-2 rounded mt-1" />
+          </label>
+
+          <div class="flex gap-3 mt-2">
+            <button id="analyzeBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Analisis Sekarang</button>
+            <button id="resetBtn" class="px-4 py-2 rounded-xl border hover:bg-slate-50">Reset</button>
+            <button id="exportBtn" class="px-4 py-2 rounded-xl border hover:bg-slate-50">Export CSV</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Output -->
+      <section class="lg:col-span-3 bg-white rounded-2xl shadow p-6">
+        <h2 class="text-lg font-semibold mb-3">Hasil Diagnosis</h2>
+        <div id="deviceInfo" class="mb-3 text-sm text-slate-600"></div>
+
+        <div id="scores" class="space-y-3 mb-4"></div>
+
+        <div class="my-4 h-px bg-slate-100"></div>
+
+        <div id="recommendations" class="space-y-3"></div>
+
+        <div class="my-4 h-px bg-slate-100"></div>
+
+        <div>
+          <h3 class="font-medium">Output Spesifik</h3>
+          <p id="specificOutput" class="text-sm text-slate-700 mt-2"></p>
+        </div>
+      </section>
+    </div>
+
+    <section class="mt-6 bg-white rounded-2xl shadow p-6">
+      <h3 class="font-semibold">Metode & Referensi</h3>
+      <ul class="list-disc ml-5 text-sm text-slate-600 mt-2">
+        <li>Battery thresholds (health & cycles): praktik industri (ganti/peringatan sekitar <strong>80%</strong> health / >300-500 siklus).</li>
+        <li>S.M.A.R.T. Reallocated Sectors: <strong>0 safe</strong>, 1–50 peringatan, &gt;50 kritis — indikasi potensi failure.</li>
+        <li>Drive temperature optimum: <strong>36–47°C</strong> (temperatur ekstrem menaikkan risiko kegagalan).</li>
+        <li>Referensi: dokumentasi produsen, Battery University, S.M.A.R.T. literature, praktik servis teknisi.</li>
+      </ul>
+      <p class="text-xs text-slate-400 mt-2">Catatan: sistem ini prototipe; untuk akurasi industri, lakukan kalibrasi rule MF terhadap dataset kasus servis (label dari teknisi).</p>
+    </section>
   </main>
 
-  <!-- HASIL -->
-  <section id="hasil" class="max-w-6xl mx-auto mt-6 p-6 bg-white shadow rounded-xl hidden">
-    <h2 class="text-xl font-semibold mb-4">Hasil Diagnosa</h2>
-    <p id="laptopInfo" class="mb-4 text-gray-700"></p>
-    <div id="output" class="space-y-3"></div>
-    <div id="rekomendasi" class="mt-6 p-4 bg-green-50 border-l-4 border-green-600 text-green-800 rounded"></div>
-  </section>
-
-  <footer class="text-center mt-8 p-4 text-sm text-gray-500">
-    &copy; 2025 Diagnosa Laptop - Sistem Pakar Fuzzy
+  <footer class="text-center py-6 text-xs text-slate-500">
+    FuzzyDiag — Demo edukasi. Bukan pengganti pemeriksaan teknisi profesional.
   </footer>
 
   <script>
-    // Membership functions sederhana
-    function mfLow(x, a, b) {
-      if (x <= a) return 1;
-      if (x >= b) return 0;
-      return (b - x) / (b - a);
-    }
-    function mfHigh(x, a, b) {
-      if (x <= a) return 0;
-      if (x >= b) return 1;
-      return (x - a) / (b - a);
-    }
+    // ---------- Utility MFs ----------
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+    const tri = (x, a, b, c) => {
+      if (x <= a || x >= c) return 0;
+      if (x === b) return 1;
+      return x < b ? (x - a) / (b - a) : (c - x) / (c - b);
+    };
+    const trap = (x, a, b, c, d) => {
+      if (x <= a || x >= d) return 0;
+      if (x >= b && x <= c) return 1;
+      return x < b ? (x - a) / (b - a) : (d - x) / (d - c);
+    };
 
-    // Diagnosa
-    document.getElementById("diagnosaForm").addEventListener("submit", function(e){
-      e.preventDefault();
-      const nama = document.getElementById("nama").value;
-      const model = document.getElementById("model").value;
-      const suhu = parseFloat(document.getElementById("suhu").value);
-      const cpu = parseFloat(document.getElementById("cpu").value);
-      const ram = parseFloat(document.getElementById("ram").value);
-      const storage = parseFloat(document.getElementById("storage").value);
-      const baterai = parseFloat(document.getElementById("baterai").value);
-      const siklus = parseFloat(document.getElementById("siklus").value);
-      const hardware = parseFloat(document.getElementById("hardware").value);
-      const smart = parseFloat(document.getElementById("smart").value);
-      const gpu = parseFloat(document.getElementById("gpu").value);
-      const layar = parseFloat(document.getElementById("layar").value);
-      const inputdev = parseFloat(document.getElementById("inputdev").value);
+    // ---------- Membership functions (berdasarkan data praktik) ----------
+    const mf = {
+      // Battery health: High >80, Med 60-80, Low <60
+      batHealth: {
+        high: h => trap(h, 80, 85, 100, 100),
+        med:  h => tri(h, 60, 70, 85),
+        low:  h => trap(h, 0, 0, 55, 65)
+      },
+      batCycles: {
+        low:  c => trap(c, -1, 0, 0, 300),
+        med:  c => tri(c, 200, 400, 600),
+        high: c => trap(c, 500, 700, 5000, 5000)
+      },
+      diskFree: {
+        high: p => trap(p, 20, 30, 100, 100),
+        med:  p => tri(p, 10, 18, 30),
+        low:  p => trap(p, 0, 0, 8, 12)
+      },
+      realloc: {
+        safe: n => n <= 0 ? 1 : 0,
+        warn: n => tri(n, 1, 10, 50),
+        crit: n => trap(n, 40, 80, 5000, 5000)
+      },
+      driveTemp: {
+        optimum: t => tri(t, 36, 42, 47),
+        risk_low: t => t < 30 ? 1 : 0,
+        risk_high: t => trap(t, 50, 55, 120, 120)
+      },
+      cpuTemp: {
+        safe: t => trap(t, 0, 0, 55, 70),
+        high: t => tri(t, 65, 80, 95),
+        crit: t => trap(t, 90, 95, 120, 120)
+      },
+      cpuUsage: {
+        low: v => trap(v, -1, 0, 20, 35),
+        med: v => tri(v, 25, 50, 75),
+        high: v => trap(v, 60, 80, 100, 100)
+      },
+      ramUsage: {
+        low: v => trap(v, -1, 0, 40, 55),
+        med: v => tri(v, 45, 65, 85),
+        high: v => trap(v, 70, 85, 100, 100)
+      },
+      bool: {
+        yes: v => Number(v) ? 1 : 0,
+        no:  v => Number(v) ? 0 : 1
+      },
+      beep: {
+        none: b => Number(b) === 0 ? 1 : 0,
+        single: b => Number(b) === 1 ? 1 : 0,
+        multi: b => Number(b) === 2 ? 1 : 0
+      }
+    };
 
-      // Fuzzy inference lebih lengkap
-      let thermal = Math.max(mfHigh(suhu, 70, 90), mfHigh(cpu, 85, 100));
-      let bateraiRusak = Math.max(mfLow(baterai, 50, 80), mfHigh(siklus, 500, 1000));
-      let storageRusak = Math.max(mfLow(storage, 5, 10), mfHigh(smart, 100, 300));
-      let ramPenuh = mfHigh(ram, 80, 100);
-      let matiTotal = hardware === 0 ? 1 : 0;
-      let gpuRusak = gpu === 1 ? 0.9 : 0;
-      let layarRusak = layar === 1 ? 0.9 : 0;
-      let inputRusak = inputdev === 1 ? 0.7 : 0;
+    // ---------- Rule base (inference) ----------
+    function infer(inputs) {
+      const AND = Math.min, OR = Math.max;
+      const { cpuTemp, driveTemp, cpuUsage, ramUsage, diskFree, realloc, batHealth, batCycles, adapter, leds, fans, screenErr, gpuErr, beep, notes } = inputs;
 
-      // Motherboard problem → mati total + tidak ada respon
-      let motherboardRusak = (matiTotal > 0.7 && gpuRusak < 0.5 && layarRusak < 0.5) ? 0.85 : 0;
+      const B = { high: mf.batHealth.high(batHealth), med: mf.batHealth.med(batHealth), low: mf.batHealth.low(batHealth) };
+      const BC = { low: mf.batCycles.low(batCycles), med: mf.batCycles.med(batCycles), high: mf.batCycles.high(batCycles) };
+      const Df = { high: mf.diskFree.high(diskFree), med: mf.diskFree.med(diskFree), low: mf.diskFree.low(diskFree) };
+      const Re = { safe: mf.realloc.safe(realloc), warn: mf.realloc.warn(realloc), crit: mf.realloc.crit(realloc) };
+      const DT = { opt: mf.driveTemp.optimum(driveTemp), rlow: mf.driveTemp.risk_low(driveTemp), rhigh: mf.driveTemp.risk_high(driveTemp) };
+      const CT = { safe: mf.cpuTemp.safe(cpuTemp), high: mf.cpuTemp.high(cpuTemp), crit: mf.cpuTemp.crit(cpuTemp) };
+      const U = { low: mf.cpuUsage.low(cpuUsage), med: mf.cpuUsage.med(cpuUsage), high: mf.cpuUsage.high(cpuUsage) };
+      const R = { low: mf.ramUsage.low(ramUsage), med: mf.ramUsage.med(ramUsage), high: mf.ramUsage.high(ramUsage) };
+      const Ad = { on: mf.bool.yes(adapter), off: mf.bool.no(adapter) };
+      const L = { on: mf.bool.yes(leds), off: mf.bool.no(leds) };
+      const F = { on: mf.bool.yes(fans), off: mf.bool.no(fans) };
+      const Sc = { err: mf.bool.yes(screenErr), ok: mf.bool.no(screenErr) };
+      const Gp = { err: mf.bool.yes(gpuErr), ok: mf.bool.no(gpuErr) };
+      const Be = { none: mf.beep.none(beep), single: mf.beep.single(beep), multi: mf.beep.multi(beep) };
 
-      let skor = {
-        "Mati Total": matiTotal,
-        "Kerusakan Thermal (Cepat Panas)": thermal,
-        "Kerusakan Baterai": bateraiRusak,
-        "Kerusakan Penyimpanan": storageRusak,
-        "Laptop Lemot (CPU/RAM tinggi)": ramPenuh,
-        "Kerusakan GPU/VGA": gpuRusak,
-        "Kerusakan Layar": layarRusak,
-        "Kerusakan Keyboard/Touchpad": inputRusak,
-        "Kerusakan Motherboard": motherboardRusak
+      // initialize activations
+      let act = {
+        noPower: 0,
+        motherboard: 0,
+        overheat: 0,
+        batteryFail: 0,
+        storageFail: 0,
+        slowPerf: 0,
+        memoryFault: 0,
+        gpuFault: 0,
+        displayFault: 0,
+        softwareIssue: 0
       };
 
-      // Tampilkan hasil
-      let outputHTML = "";
-      for (let [key, val] of Object.entries(skor)) {
-        outputHTML += `
-          <div>
-            <div class="flex justify-between">
-              <span class="font-medium">${key}</span>
-              <span>${(val*100).toFixed(1)}%</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-3">
-              <div class="bg-green-600 h-3 rounded-full" style="width:${val*100}%"></div>
-            </div>
-          </div>`;
+      // ----- Rules (representative & extensible) -----
+      // NO POWER (Mati total)
+      act.noPower = OR(act.noPower, AND(Ad.off, B.low));                       // tidak terhubung + baterai rendah
+      act.noPower = OR(act.noPower, AND(Ad.on, L.off, F.off));                  // adaptor on tapi LED & kipas mati (power IC / board)
+      act.noPower = OR(act.noPower, AND(Ad.on, L.off, Be.multi));               // adaptor on, LED mati, beep multiple => motherboard
+
+      // MOTHERBOARD
+      act.motherboard = OR(act.motherboard, AND(Ad.on, L.off, F.off));
+      act.motherboard = OR(act.motherboard, AND(Be.multi, L.off));
+      act.motherboard = OR(act.motherboard, AND(Sc.err, Be.multi));            // black screen + multi beep -> board/post
+
+      // OVERHEAT / THERMAL
+      act.overheat = OR(act.overheat, CT.high);
+      act.overheat = OR(act.overheat, CT.crit);
+      act.overheat = OR(act.overheat, AND(CT.high, F.off));                    // fans off while high temp
+      act.overheat = OR(act.overheat, AND(U.high, CT.high));
+
+      // BATTERY FAIL
+      act.batteryFail = OR(act.batteryFail, B.low);
+      act.batteryFail = OR(act.batteryFail, BC.high);                          // siklus tinggi
+      act.batteryFail = OR(act.batteryFail, AND(B.low, Ad.off));               // battery low + adapter off
+
+      // STORAGE FAIL
+      act.storageFail = OR(act.storageFail, Re.crit);
+      act.storageFail = OR(act.storageFail, AND(Re.warn, Df.low));
+      act.storageFail = OR(act.storageFail, AND(Df.low, DT.rhigh));            // low free + drive overheat
+
+      // SLOW PERFORMANCE
+      act.slowPerf = OR(act.slowPerf, U.high);
+      act.slowPerf = OR(act.slowPerf, R.high);
+      act.slowPerf = OR(act.slowPerf, AND(Df.low, OR(U.med, R.med)));
+      // Throttling causes perceived slowness
+      act.slowPerf = OR(act.slowPerf, AND(CT.crit, U.high));
+
+      // MEMORY / RAM FAULT
+      act.memoryFault = OR(act.memoryFault, AND(R.high, Be.single));          // single beep + high RAM usage on POST suggests RAM
+      act.memoryFault = OR(act.memoryFault, AND(R.high, U.low));              // RAM high even if CPU low suggests mem leak or faulty module
+
+      // GPU / VGA
+      act.gpuFault = OR(act.gpuFault, Gp.err);
+      act.gpuFault = OR(act.gpuFault, AND(CT.high, Gp.err));
+
+      // DISPLAY
+      act.displayFault = OR(act.displayFault, Sc.err);
+      act.displayFault = OR(act.displayFault, AND(Sc.err, Gp.err));
+
+      // SOFTWARE ISSUE
+      act.softwareIssue = OR(act.softwareIssue, AND(U.high, R.med, Df.high));
+      act.softwareIssue = OR(act.softwareIssue, AND(U.med, R.med, Df.high));
+
+      // ---- map activations to 0..100 scores ----
+      const mapScore = a => clamp(Math.round(a * 100), 0, 100);
+
+      const scores = {
+        noPower: mapScore(act.noPower),
+        motherboard: mapScore(act.motherboard),
+        overheat: mapScore(act.overheat),
+        batteryFail: mapScore(act.batteryFail),
+        storageFail: mapScore(act.storageFail),
+        slowPerf: mapScore(act.slowPerf),
+        memoryFault: mapScore(act.memoryFault),
+        gpuFault: mapScore(act.gpuFault),
+        displayFault: mapScore(act.displayFault),
+        softwareIssue: mapScore(act.softwareIssue),
+        debug: { B, BC, Df, Re, DT, CT, U, R, Ad, L, F, Sc, Gp, Be }
+      };
+
+      return scores;
+    }
+
+    // ---------- Recommendations generator ----------
+    function recommendations(scores, inputs) {
+      const rec = [];
+      if (scores.noPower >= 60) {
+        rec.push({
+          title: 'Mati Total / Tidak Menyala',
+          desc: 'Periksa adaptor (ukur output), ganti adaptor jika perlu. Lepas baterai (jika removable) dan coba hidupkan tanpa baterai. Bila LED & kipas mati meski adaptor terpasang, kemungkinan power-IC / motherboard.'
+        });
       }
+      if (scores.motherboard >= 50) {
+        rec.push({
+          title: 'Indikasi Kerusakan Motherboard / Power Circuit',
+          desc: 'Kondisi: POST beep code multiple, LED mati, kipas tidak berputar. Disarankan pemeriksaan service profesional (pengukuran tegangan rail, visual inspect komponen terbakar).'
+        });
+      }
+      if (scores.overheat >= 40) {
+        rec.push({
+          title: 'Overheat / Thermal',
+          desc: 'Bersihkan heatsink & ventilasi, cek kipas, ganti thermal paste bila sudah lama, dan gunakan cooling pad. Jika panas menyebabkan shutdown, segera periksa heatsink & thermal sensor.'
+        });
+      }
+      if (scores.batteryFail >= 40) {
+        rec.push({
+          title: 'Baterai Melemah',
+          desc: 'Jika health <80% atau cycles >300–500, pertimbangkan penggantian baterai. Periksa juga charging circuit jika baterai tidak mengisi.'
+        });
+      }
+      if (scores.storageFail >= 40) {
+        rec.push({
+          title: 'Potensi Kerusakan Storage (HDD/SSD)',
+          desc: 'Backup data segera. Jalankan SMART full test. Reallocated sectors tinggi &/atau suhu drive tinggi meningkatkan risiko failure.'
+        });
+      }
+      if (scores.slowPerf >= 40) {
+        rec.push({
+          title: 'Performa Lambat',
+          desc: 'Cek proses latar (Task Manager/top), periksa penggunaan RAM/Swap. Jika disk penuh atau sedang thrashing, bersihkan ruang atau upgrade storage/RAM.'
+        });
+      }
+      if (scores.memoryFault >= 40) {
+        rec.push({
+          title: 'Kemungkinan Masalah RAM',
+          desc: 'Jalankan memtest86 atau Windows Memory Diagnostic; tes modul per modul. Periksa slot dan konektor RAM.'
+        });
+      }
+      if (scores.gpuFault >= 40) {
+        rec.push({
+          title: 'GPU / VGA Fault',
+          desc: 'Artefak/driver crash dapat menandakan masalah driver atau hardware GPU. Update driver, jalankan stress test; jika tetap muncul artefak, ada kemungkinan kerusakan GPU.'
+        });
+      }
+      if (scores.displayFault >= 40) {
+        rec.push({
+          title: 'Masalah Layar / Display',
+          desc: 'Periksa kabel fleksibel dan konektor, coba sambungkan ke monitor eksternal untuk membedakan antara panel & GPU.'
+        });
+      }
+      if (scores.softwareIssue >= 40) {
+        rec.push({
+          title: 'Kemungkinan Masalah Perangkat Lunak',
+          desc: 'Update OS & driver, scan malware, bersihkan startup apps, pertimbangkan reinstall OS bila perlu.'
+        });
+      }
+      if (rec.length === 0) rec.push({ title: 'Tidak Ada Indikasi Kuat', desc: 'Berdasarkan input saat ini tidak ada penyebab dominan. Periksa dengan diagnostic tools & observasi ulang.' });
 
-      document.getElementById("laptopInfo").innerHTML = 
-        `<strong>Laptop:</strong> ${nama} - ${model}`;
-      document.getElementById("output").innerHTML = outputHTML;
-      document.getElementById("hasil").classList.remove("hidden");
+      return rec;
+    }
 
-      // Rekomendasi
-      let rekom = "";
-      if (matiTotal > 0.7) rekom += "⚠️ Laptop kemungkinan <b>mati total</b>. Cek adaptor, baterai, dan motherboard.<br>";
-      if (thermal > 0.5) rekom += "🔥 Terjadi <b>overheating</b>. Bersihkan kipas/heatsink, ganti thermal paste.<br>";
-      if (bateraiRusak > 0.5) rekom += "🔋 <b>Baterai melemah</b>. Pertimbangkan penggantian.<br>";
-      if (storageRusak > 0.5) rekom += "💾 <b>Penyimpanan bermasalah</b>. Backup data segera.<br>";
-      if (ramPenuh > 0.5) rekom += "🐢 Laptop lemot akibat <b>RAM penuh</b>. Tutup aplikasi atau upgrade RAM.<br>";
-      if (gpuRusak > 0.5) rekom += "🎮 <b>GPU/VGA bermasalah</b>. Bisa karena driver crash atau VGA rusak.<br>";
-      if (layarRusak > 0.5) rekom += "🖥️ <b>Layar bermasalah</b> (blank/garis). Periksa kabel fleksibel atau panel LCD.<br>";
-      if (inputRusak > 0.5) rekom += "⌨️ <b>Keyboard/Touchpad error</b>. Bisa karena kerusakan hardware atau konektor.<br>";
-      if (motherboardRusak > 0.5) rekom += "🔧 <b>Motherboard bermasalah</b>. Disarankan dibawa ke teknisi.<br>";
+    // ---------- UI handlers ----------
+    function readInputs() {
+      return {
+        deviceName: document.getElementById('deviceName').value.trim(),
+        deviceModel: document.getElementById('deviceModel').value.trim(),
+        cpuTemp: Number(document.getElementById('cpuTemp').value || 0),
+        driveTemp: Number(document.getElementById('driveTemp').value || 0),
+        cpuUsage: Number(document.getElementById('cpuUsage').value || 0),
+        ramUsage: Number(document.getElementById('ramUsage').value || 0),
+        diskFree: Number(document.getElementById('diskFree').value || 0),
+        realloc: Number(document.getElementById('realloc').value || 0),
+        batHealth: Number(document.getElementById('batHealth').value || 100),
+        batCycles: Number(document.getElementById('batCycles').value || 0),
+        adapter: Number(document.getElementById('adapter').value || 1),
+        leds: Number(document.getElementById('leds').value || 1),
+        fans: Number(document.getElementById('fans').value || 1),
+        screenErr: Number(document.getElementById('screenErr').value || 0),
+        gpuErr: Number(document.getElementById('gpuErr').value || 0),
+        beep: Number(document.getElementById('beep').value || 0),
+        notes: document.getElementById('notes').value.trim()
+      };
+    }
 
-      if (rekom === "") rekom = "✅ Laptop dalam kondisi relatif normal.";
-      document.getElementById("rekomendasi").innerHTML = rekom;
+    function renderResults() {
+      const inputs = readInputs();
+      const scores = infer(inputs);
+
+      // device info
+      const info = (inputs.deviceName || inputs.deviceModel) ? `${inputs.deviceName} ${inputs.deviceModel}`.trim() : 'N/A';
+      document.getElementById('deviceInfo').innerText = `Device: ${info}`;
+
+      // scores
+      const order = [
+        { k: 'noPower', label: 'Mati Total' },
+        { k: 'motherboard', label: 'Motherboard / Power Circuit' },
+        { k: 'overheat', label: 'Overheat / Thermal' },
+        { k: 'batteryFail', label: 'Baterai Bermasalah' },
+        { k: 'storageFail', label: 'Storage (HDD/SSD) Bermasalah' },
+        { k: 'slowPerf', label: 'Performa Lambat' },
+        { k: 'memoryFault', label: 'Masalah RAM' },
+        { k: 'gpuFault', label: 'GPU/VGA' },
+        { k: 'displayFault', label: 'Display/Layar' },
+        { k: 'softwareIssue', label: 'Masalah Software' }
+      ];
+
+      const scoresDiv = document.getElementById('scores');
+      scoresDiv.innerHTML = order.map(o => {
+        const v = scores[o.k];
+        return `
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <div class="text-sm font-medium">${o.label}</div>
+              <div class="text-sm font-semibold">${v}%</div>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-3">
+              <div class="h-3 rounded-full ${v >= 60 ? 'bg-red-500' : v >= 40 ? 'bg-amber-500' : 'bg-emerald-500'}" style="width:${v}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // recommendations
+      const recs = recommendations(scores, inputs);
+      const recDiv = document.getElementById('recommendations');
+      recDiv.innerHTML = recs.map(r => `
+        <div class="p-3 border rounded-lg bg-slate-50">
+          <div class="font-medium text-slate-800">${r.title}</div>
+          <div class="text-sm text-slate-600 mt-1">${r.desc}</div>
+        </div>
+      `).join('');
+
+      // specific short output
+      const top = Object.entries(scores).filter(([k, v]) => k !== 'debug').sort((a,b)=>b[1]-a[1]);
+      const highest = top[0];
+      let specific = '';
+      if (highest && highest[1] >= 60) {
+        switch (highest[0]) {
+          case 'noPower': specific = 'Kemungkinan besar masalah power/baterai/motherboard yang menyebabkan device tidak menyala.'; break;
+          case 'motherboard': specific = 'Gejala mendukung kegagalan pada motherboard atau power delivery (perlu pengukuran profesional).'; break;
+          case 'overheat': specific = 'Thermal tinggi — periksa kipas, heatsink, thermal paste, dan jalur sirkulasi udara.'; break;
+          case 'batteryFail': specific = 'Baterai melemah/tidak menyimpan daya; cek health & cycles, pertimbangkan penggantian.'; break;
+          case 'storageFail': specific = 'Storage menunjukkan tanda potensi kegagalan — backup data + SMART test.'; break;
+          case 'slowPerf': specific = 'Performa lambat kemungkinan karena resource contention atau throttling; cek proses dan ruang disk.'; break;
+          case 'memoryFault': specific = 'Indikasi masalah pada RAM — jalankan memtest dan tes modul satu-per-satu.'; break;
+          case 'gpuFault': specific = 'GPU mungkin bermasalah — artefak atau crash mengarah ke driver atau hardware GPU.'; break;
+          case 'displayFault': specific = 'Masalah layar — periksa kabel fleksibel dan coba monitor eksternal.'; break;
+          case 'softwareIssue': specific = 'Kemungkinan besar penyebab perangkat lunak; update/scan OS & driver.'; break;
+          default: specific = 'Tidak ada indikasi spesifik dominan.'; break;
+        }
+      } else {
+        specific = 'Tidak ada indikasi tunggal yang dominan — lakukan pemeriksaan lebih lanjut (diagnostic tools / servis).';
+      }
+      document.getElementById('specificOutput').innerText = specific;
+    }
+
+    // ---------- Export CSV (basic) ----------
+    function exportCSV() {
+      const inputs = readInputs();
+      const scores = infer(inputs);
+      const rows = [
+        ['field','value'],
+        ['device', `${inputs.deviceName} ${inputs.deviceModel}`.trim() || 'N/A'],
+        ['cpuTemp', inputs.cpuTemp],
+        ['driveTemp', inputs.driveTemp],
+        ['cpuUsage', inputs.cpuUsage],
+        ['ramUsage', inputs.ramUsage],
+        ['diskFree', inputs.diskFree],
+        ['realloc', inputs.realloc],
+        ['batHealth', inputs.batHealth],
+        ['batCycles', inputs.batCycles]
+      ];
+      for (const [k, v] of Object.entries(scores)) {
+        if (k === 'debug') continue;
+        rows.push([`score_${k}`, v]);
+      }
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], {type: 'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(inputs.deviceName || 'diagnosis')}_diagnosis.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // ---------- events ----------
+    document.getElementById('analyzeBtn').addEventListener('click', () => {
+      renderResults();
     });
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.querySelectorAll('input, select').forEach(el => {
+        if (el.type === 'number') {
+          if (el.id === 'cpuTemp') el.value = 45;
+          else if (el.id === 'driveTemp') el.value = 40;
+          else if (el.id === 'cpuUsage') el.value = 15;
+          else if (el.id === 'ramUsage') el.value = 40;
+          else if (el.id === 'diskFree') el.value = 30;
+          else if (el.id === 'realloc') el.value = 0;
+          else if (el.id === 'batHealth') el.value = 92;
+          else if (el.id === 'batCycles') el.value = 200;
+          else el.value = '';
+        } else if (el.tagName === 'SELECT') {
+          el.selectedIndex = 0;
+        } else {
+          el.value = '';
+        }
+      });
+      document.getElementById('scores').innerHTML = '';
+      document.getElementById('recommendations').innerHTML = '';
+      document.getElementById('specificOutput').innerText = '';
+      document.getElementById('deviceInfo').innerText = '';
+    });
+    document.getElementById('exportBtn').addEventListener('click', exportCSV);
+
+    // init preview
+    renderResults();
   </script>
 </body>
 </html>
