@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Deteksi Depresi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     .fade-in {
       animation: fadeIn 0.8s ease-in-out forwards;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
@@ -22,10 +21,10 @@
   <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg">
     <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
       <h1 class="text-2xl font-bold">💙 Skrining Depresi</h1>
-      <nav>
-        <a href="#" class="px-3 hover:text-gray-200">Beranda</a>
-        <a href="#" class="px-3 hover:text-gray-200">Tentang</a>
-        <a href="#" class="px-3 hover:text-gray-200">Kontak</a>
+      <nav class="hidden sm:flex gap-4">
+        <a href="#" class="hover:text-gray-200">Beranda</a>
+        <a href="#" class="hover:text-gray-200">Tentang</a>
+        <a href="#" class="hover:text-gray-200">Kontak</a>
       </nav>
     </div>
   </header>
@@ -48,11 +47,19 @@
     </div>
 
     <!-- Hasil -->
-    <div id="result-section" class="hidden bg-white mt-8 p-6 rounded-2xl shadow-md text-center">
+    <div id="result-section" class="hidden mt-8 p-6 rounded-2xl shadow-md text-center fade-in">
       <div id="icon" class="flex justify-center mb-4"></div>
       <h2 id="result-title" class="text-2xl font-bold mb-2"></h2>
       <p id="result-desc" class="text-gray-700 mb-4"></p>
-      <p id="result-advice" class="text-indigo-600 font-medium mb-6"></p>
+
+      <!-- Progress Bar -->
+      <div class="w-full bg-gray-200 rounded-full h-4 mb-6">
+        <div id="progress-bar" class="h-4 rounded-full" style="width:0%"></div>
+      </div>
+      <p id="result-score" class="mb-6 text-sm text-gray-600"></p>
+
+      <p id="result-advice" class="font-medium mb-4"></p>
+      <blockquote id="result-motivation" class="italic text-lg text-indigo-700 mb-6"></blockquote>
       <div class="flex gap-4 justify-center">
         <button onclick="location.reload()" class="px-6 py-2 bg-gray-200 rounded-xl hover:bg-gray-300">Isi Ulang</button>
         <button onclick="alert('Terima kasih, jaga kesehatan mental Anda 💙')" class="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">Selesai</button>
@@ -87,6 +94,14 @@
       "Hampir setiap hari"
     ];
 
+    const motivationTexts = {
+      none: "🌟 Kamu sudah melakukan yang terbaik. Jaga pola hidup sehat dan terus tersenyum.",
+      mild: "✨ Perjalanan hidup memang naik turun. Kamu kuat, teruslah berproses dan hargai setiap langkah kecilmu.",
+      moderate: "🌈 Ingat, badai pasti berlalu. Jangan ragu mencari dukungan, kamu tidak sendirian.",
+      moderately_severe: "💪 Kamu sudah hebat bisa bertahan sejauh ini. Cari bantuan, ada banyak orang yang peduli padamu.",
+      severe: "❤️ Hidupmu sangat berharga. Tolong segera hubungi orang terdekat atau tenaga profesional. Kamu tidak sendiri."
+    };
+
     const questionsDiv = document.getElementById("questions");
     questions.forEach((q, i) => {
       const qDiv = document.createElement("div");
@@ -117,42 +132,69 @@
       let desc = "";
       let advice = "";
       let icon = "";
+      let motivation = "";
+      let colorClass = "";
+      let barColor = "";
 
       if (score <= 4) {
         title = "Tidak ada depresi";
         desc = "Gejala depresi tidak terlihat signifikan.";
         advice = "Tetap jaga gaya hidup sehat dan terus terhubung dengan orang-orang terdekat.";
         icon = "😊";
+        motivation = motivationTexts.none;
+        colorClass = "bg-green-50";
+        barColor = "bg-green-500";
       } else if (score <= 9) {
         title = "Depresi ringan";
         desc = "Terdapat beberapa gejala depresi.";
         advice = "Cobalah teknik relaksasi, olahraga, dan bicara dengan orang yang dipercaya.";
         icon = "🙂";
+        motivation = motivationTexts.mild;
+        colorClass = "bg-yellow-50";
+        barColor = "bg-yellow-500";
       } else if (score <= 14) {
         title = "Depresi sedang";
         desc = "Gejala depresi cukup terasa dan mungkin memengaruhi aktivitas sehari-hari.";
         advice = "Pertimbangkan untuk berkonsultasi dengan psikolog atau konselor.";
         icon = "😟";
+        motivation = motivationTexts.moderate;
+        colorClass = "bg-orange-50";
+        barColor = "bg-orange-500";
       } else if (score <= 19) {
         title = "Depresi cukup berat";
         desc = "Gejala depresi cukup mengganggu kehidupan Anda.";
         advice = "Disarankan segera mencari bantuan tenaga kesehatan profesional.";
         icon = "😢";
+        motivation = motivationTexts.moderately_severe;
+        colorClass = "bg-red-50";
+        barColor = "bg-red-500";
       } else {
         title = "Depresi berat";
         desc = "Gejala depresi sangat serius.";
         advice = "Segera hubungi psikolog/psikiater atau layanan darurat bila merasa tidak aman.";
         icon = "💔";
+        motivation = motivationTexts.severe;
+        colorClass = "bg-red-100";
+        barColor = "bg-red-600";
       }
 
       document.getElementById("form-section").classList.add("hidden");
       const result = document.getElementById("result-section");
-      result.classList.remove("hidden");
-      result.classList.add("fade-in");
+      result.className = `mt-8 p-6 rounded-2xl shadow-md text-center fade-in ${colorClass}`;
       document.getElementById("result-title").textContent = title;
       document.getElementById("result-desc").textContent = desc;
       document.getElementById("result-advice").textContent = advice;
+      document.getElementById("result-motivation").textContent = motivation;
       document.getElementById("icon").innerHTML = `<div class="text-6xl">${icon}</div>`;
+
+      // Progress bar update
+      const percent = (score / 27) * 100;
+      const bar = document.getElementById("progress-bar");
+      bar.style.width = percent + "%";
+      bar.className = `h-4 rounded-full transition-all duration-700 ${barColor}`;
+      document.getElementById("result-score").textContent = `Skor Anda: ${score} dari 27`;
+
+      result.classList.remove("hidden");
     });
   </script>
 </body>
