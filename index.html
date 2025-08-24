@@ -7,160 +7,136 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
-  <header class="bg-indigo-600 text-white p-4 text-center shadow">
-    <h1 class="text-2xl font-bold">Diagnosa Kerusakan Laptop</h1>
-    <p class="text-sm">Berbasis Logika Fuzzy</p>
+  <!-- HEADER -->
+  <header class="bg-green-600 text-white p-4 shadow-md">
+    <h1 class="text-2xl font-bold">Diagnosa Kerusakan Laptop (Logika Fuzzy)</h1>
+    <p class="text-sm">Masukkan parameter kondisi laptop untuk analisis otomatis</p>
   </header>
 
-  <main class="max-w-5xl mx-auto mt-8 p-6 bg-white shadow rounded-xl">
-    <h2 class="text-xl font-semibold mb-4">Masukkan Data Laptop</h2>
-    <form id="fuzzyForm" class="space-y-4">
-      <div>
-        <label class="block mb-1 font-medium">Nama Laptop</label>
-        <input type="text" id="namaLaptop" class="w-full border p-2 rounded" placeholder="Contoh: Asus Vivobook">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">Model / Seri</label>
-        <input type="text" id="seriLaptop" class="w-full border p-2 rounded" placeholder="Contoh: X415EA">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">Suhu CPU/GPU (°C)</label>
-        <input type="number" id="suhu" min="20" max="120" value="40" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">Penggunaan CPU (%)</label>
-        <input type="number" id="cpu" min="0" max="100" value="20" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">Penggunaan RAM (%)</label>
-        <input type="number" id="ram" min="0" max="100" value="30" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">Ruang Kosong Penyimpanan (%)</label>
-        <input type="number" id="disk" min="0" max="100" value="50" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">SMART (Reallocated Sectors)</label>
-        <input type="number" id="smart" min="0" value="0" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">Kesehatan Baterai (%)</label>
-        <input type="number" id="baterai" min="0" max="100" value="90" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">Jumlah Siklus Baterai</label>
-        <input type="number" id="siklus" min="0" value="200" class="w-full border p-2 rounded">
-      </div>
-      <div>
-        <label class="block mb-1 font-medium">Adaptor / LED / Kipas / Beep Code</label>
-        <input type="text" id="statusTambahan" class="w-full border p-2 rounded" placeholder="Contoh: LED tidak menyala, beep 3x">
-      </div>
-      <div>
-        <button type="button" onclick="analisis()" class="bg-indigo-600 text-white px-4 py-2 rounded shadow">Analisis Sekarang</button>
-      </div>
+  <!-- FORM -->
+  <main class="max-w-5xl mx-auto mt-6 p-6 bg-white shadow rounded-xl">
+    <h2 class="text-xl font-semibold mb-4">Masukkan Kondisi Laptop</h2>
+    <form id="diagnosaForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <label>
+        Suhu CPU/GPU (°C)
+        <input type="number" id="suhu" class="w-full border p-2 rounded" min="20" max="120" required>
+      </label>
+      <label>
+        Penggunaan CPU (%) 
+        <input type="number" id="cpu" class="w-full border p-2 rounded" min="0" max="100" required>
+      </label>
+      <label>
+        Penggunaan RAM (%) 
+        <input type="number" id="ram" class="w-full border p-2 rounded" min="0" max="100" required>
+      </label>
+      <label>
+        Sisa Penyimpanan (%) 
+        <input type="number" id="storage" class="w-full border p-2 rounded" min="0" max="100" required>
+      </label>
+      <label>
+        Kesehatan Baterai (%) 
+        <input type="number" id="baterai" class="w-full border p-2 rounded" min="0" max="100" required>
+      </label>
+      <label>
+        Jumlah Siklus Baterai 
+        <input type="number" id="siklus" class="w-full border p-2 rounded" min="0" max="2000" required>
+      </label>
+      <label>
+        Status LED/Adaptor/Kipas (0=tidak nyala, 1=nyala)
+        <input type="number" id="hardware" class="w-full border p-2 rounded" min="0" max="1" required>
+      </label>
+      <label>
+        SMART Reallocated Sectors (Storage Health) 
+        <input type="number" id="smart" class="w-full border p-2 rounded" min="0" max="1000" required>
+      </label>
+      <label class="md:col-span-2">
+        Catatan Tambahan
+        <textarea id="catatan" class="w-full border p-2 rounded"></textarea>
+      </label>
+      <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Analisis Sekarang</button>
     </form>
-
-    <div id="hasil" class="mt-8 hidden">
-      <h2 class="text-xl font-semibold mb-4">Hasil Analisis</h2>
-      <p class="mb-2"><strong>Laptop:</strong> <span id="outNama"></span> (<span id="outSeri"></span>)</p>
-      <div id="scoreArea" class="space-y-3"></div>
-      <div class="mt-4 p-4 border rounded bg-gray-50">
-        <h3 class="font-semibold mb-2">Rekomendasi:</h3>
-        <ul id="rekomendasi" class="list-disc pl-5 text-sm"></ul>
-      </div>
-      <div class="mt-4 p-4 border rounded bg-gray-50">
-        <h3 class="font-semibold mb-2">Output Spesifik:</h3>
-        <p id="spesifik" class="text-sm text-gray-700"></p>
-      </div>
-    </div>
   </main>
 
-  <footer class="text-center text-gray-600 text-sm py-4 mt-8">
-    &copy; 2025 Diagnosa Laptop Fuzzy - Dibuat dengan Tailwind
+  <!-- HASIL -->
+  <section id="hasil" class="max-w-5xl mx-auto mt-6 p-6 bg-white shadow rounded-xl hidden">
+    <h2 class="text-xl font-semibold mb-4">Hasil Diagnosa</h2>
+    <div id="output" class="space-y-2"></div>
+    <div id="rekomendasi" class="mt-4 p-4 bg-green-50 border-l-4 border-green-600 text-green-800 rounded"></div>
+  </section>
+
+  <footer class="text-center mt-8 p-4 text-sm text-gray-500">
+    &copy; 2025 Diagnosa Laptop - Sistem Pakar Fuzzy
   </footer>
 
   <script>
-    function analisis() {
-      const nama = document.getElementById('namaLaptop').value || '-';
-      const seri = document.getElementById('seriLaptop').value || '-';
-      const suhu = parseFloat(document.getElementById('suhu').value);
-      const cpu = parseFloat(document.getElementById('cpu').value);
-      const ram = parseFloat(document.getElementById('ram').value);
-      const disk = parseFloat(document.getElementById('disk').value);
-      const smart = parseFloat(document.getElementById('smart').value);
-      const baterai = parseFloat(document.getElementById('baterai').value);
-      const siklus = parseFloat(document.getElementById('siklus').value);
-      const tambahan = document.getElementById('statusTambahan').value;
+    // Membership functions sederhana
+    function mfLow(x, a, b) {
+      if (x <= a) return 1;
+      if (x >= b) return 0;
+      return (b - x) / (b - a);
+    }
+    function mfHigh(x, a, b) {
+      if (x <= a) return 0;
+      if (x >= b) return 1;
+      return (x - a) / (b - a);
+    }
 
-      let hasil = {
-        matiTotal: 0,
-        motherboard: 0,
-        thermal: 0,
-        bateraiRusak: 0,
-        lemot: 0,
-        storage: 0,
-        ramRusak: 0,
-        software: 0
+    // Diagnosa
+    document.getElementById("diagnosaForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      const suhu = parseFloat(document.getElementById("suhu").value);
+      const cpu = parseFloat(document.getElementById("cpu").value);
+      const ram = parseFloat(document.getElementById("ram").value);
+      const storage = parseFloat(document.getElementById("storage").value);
+      const baterai = parseFloat(document.getElementById("baterai").value);
+      const siklus = parseFloat(document.getElementById("siklus").value);
+      const hardware = parseFloat(document.getElementById("hardware").value);
+      const smart = parseFloat(document.getElementById("smart").value);
+
+      // Fuzzy inference sederhana
+      let thermal = Math.max(mfHigh(suhu, 70, 90), mfHigh(cpu, 80, 100));
+      let bateraiRusak = Math.max(mfLow(baterai, 50, 80), mfHigh(siklus, 500, 1000));
+      let storageRusak = Math.max(mfLow(storage, 5, 10), mfHigh(smart, 50, 200));
+      let ramPenuh = mfHigh(ram, 80, 100);
+      let matiTotal = hardware === 0 ? 1 : 0;
+
+      let skor = {
+        "Mati Total": matiTotal,
+        "Kerusakan Thermal (Cepat Panas)": thermal,
+        "Kerusakan Baterai": bateraiRusak,
+        "Kerusakan Penyimpanan": storageRusak,
+        "Laptop Lemot (CPU/RAM tinggi)": ramPenuh,
       };
 
-      // logika fuzzy sederhana
-      if (suhu > 85) hasil.thermal += 80;
-      else if (suhu > 70) hasil.thermal += 50;
-
-      if (cpu > 90 || ram > 90) hasil.lemot += 70;
-      else if (cpu > 70 || ram > 70) hasil.lemot += 40;
-
-      if (disk < 10) hasil.storage += 80;
-      else if (disk < 20) hasil.storage += 50;
-
-      if (smart > 10) hasil.storage += 70;
-
-      if (baterai < 60 || siklus > 800) hasil.bateraiRusak += 70;
-      else if (baterai < 80 || siklus > 500) hasil.bateraiRusak += 40;
-
-      if (tambahan.toLowerCase().includes('tidak menyala') || tambahan.toLowerCase().includes('beep')) hasil.matiTotal += 90;
-      if (tambahan.toLowerCase().includes('led tidak menyala')) hasil.motherboard += 70;
-
-      // tampilkan hasil
-      document.getElementById('outNama').innerText = nama;
-      document.getElementById('outSeri').innerText = seri;
-
-      const area = document.getElementById('scoreArea');
-      area.innerHTML = '';
-      for (const [key, val] of Object.entries(hasil)) {
-        area.innerHTML += `
+      // Tampilkan hasil
+      let outputHTML = "";
+      for (let [key, val] of Object.entries(skor)) {
+        outputHTML += `
           <div>
-            <p class="font-medium capitalize">${key.replace(/([A-Z])/g, ' $1')}</p>
-            <div class="w-full bg-gray-200 rounded-full h-4">
-              <div class="bg-indigo-600 h-4 rounded-full" style="width: ${Math.min(val,100)}%"></div>
+            <div class="flex justify-between">
+              <span>${key}</span>
+              <span>${(val*100).toFixed(1)}%</span>
             </div>
-            <p class="text-xs text-gray-600">Skor: ${val}</p>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div class="bg-green-600 h-3 rounded-full" style="width:${val*100}%"></div>
+            </div>
           </div>`;
       }
 
-      // rekomendasi
-      const rekom = document.getElementById('rekomendasi');
-      rekom.innerHTML = '';
-      if (hasil.thermal > 60) rekom.innerHTML += '<li>Bersihkan kipas & ganti thermal paste</li>';
-      if (hasil.bateraiRusak > 60) rekom.innerHTML += '<li>Pertimbangkan ganti baterai</li>';
-      if (hasil.storage > 60) rekom.innerHTML += '<li>Backup data dan cek kesehatan HDD/SSD</li>';
-      if (hasil.lemot > 60) rekom.innerHTML += '<li>Upgrade RAM atau optimasi software</li>';
-      if (hasil.matiTotal > 60) rekom.innerHTML += '<li>Cek adaptor, motherboard, bawa ke service</li>';
-      if (rekom.innerHTML === '') rekom.innerHTML = '<li>Kondisi relatif normal</li>';
+      document.getElementById("output").innerHTML = outputHTML;
+      document.getElementById("hasil").classList.remove("hidden");
 
-      // output spesifik
-      let outSpesifik = '';
-      if (hasil.matiTotal > 80) outSpesifik = 'Kemungkinan besar laptop tidak dapat dinyalakan karena kegagalan hardware utama (motherboard atau power supply).';
-      else if (hasil.thermal > 70) outSpesifik = 'Laptop mengalami overheating, potensi kerusakan ada pada kipas atau sistem pendingin.';
-      else if (hasil.bateraiRusak > 60) outSpesifik = 'Baterai cepat habis atau rusak, siklus tinggi atau kapasitas sudah turun drastis.';
-      else if (hasil.storage > 60) outSpesifik = 'Penyimpanan bermasalah, kemungkinan bad sector atau penuh sehingga sistem melambat.';
-      else if (hasil.lemot > 60) outSpesifik = 'Laptop lemot akibat penggunaan CPU/RAM tinggi atau software berat.';
-      else outSpesifik = 'Tidak ada indikasi kerusakan serius terdeteksi.';
+      // Rekomendasi
+      let rekom = "";
+      if (matiTotal > 0.7) rekom += "Laptop kemungkinan mati total. Cek adaptor, baterai, dan motherboard.<br>";
+      if (thermal > 0.5) rekom += "Laptop mengalami masalah panas berlebih. Bersihkan kipas/heatsink, ganti thermal paste.<br>";
+      if (bateraiRusak > 0.5) rekom += "Baterai sudah melemah. Pertimbangkan penggantian baterai.<br>";
+      if (storageRusak > 0.5) rekom += "Penyimpanan berpotensi rusak. Segera backup data.<br>";
+      if (ramPenuh > 0.5) rekom += "Laptop lemot akibat RAM penuh. Tutup aplikasi atau upgrade RAM.<br>";
 
-      document.getElementById('spesifik').innerText = outSpesifik;
-
-      document.getElementById('hasil').classList.remove('hidden');
-    }
+      if (rekom === "") rekom = "Laptop dalam kondisi relatif normal.";
+      document.getElementById("rekomendasi").innerHTML = rekom;
+    });
   </script>
 </body>
 </html>
