@@ -10,8 +10,32 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide-react@latest/dist/lucide.min.js"></script>
 </head>
-<body class="bg-gradient-to-r from-blue-50 to-blue-100 min-h-screen flex items-center justify-center p-6">
-  <div id="root" class="w-full max-w-3xl"></div>
+<body class="bg-gradient-to-r from-blue-50 to-blue-100 min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-blue-700 text-white shadow-lg">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-bold flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-3-3v6m9-6a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Mental Health Check
+      </h1>
+      <span class="text-sm">Tes Skrining Depresi (PHQ-9)</span>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main id="root" class="flex-1 w-full max-w-3xl mx-auto px-4 py-8"></main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-100 border-t border-gray-200 mt-10">
+    <div class="max-w-5xl mx-auto px-6 py-6 text-center text-gray-600 text-sm leading-relaxed">
+      <p>⚠️ Hasil skrining ini <span class="font-semibold">bukan diagnosis resmi</span> medis. Jika hasil menunjukkan depresi sedang hingga berat, segera konsultasi dengan psikolog atau psikiater.</p>
+      <p class="mt-2">Jika Anda memiliki pikiran untuk menyakiti diri, segera hubungi <span class="font-semibold text-red-600">119</span> (darurat) atau layanan kesehatan terdekat.</p>
+      <p class="mt-4">&copy; 2025 Mental Health Check | Dibuat dengan ❤️ untuk kesadaran kesehatan mental</p>
+    </div>
+  </footer>
+
   <script type="text/babel">
     const { Smile, Meh, Frown, AlertTriangle, AlertOctagon } = lucide;
 
@@ -70,7 +94,7 @@
 
       return (
         <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-200">
-          <h1 className="text-3xl font-bold text-center mb-6 text-blue-700">Skrining Depresi (PHQ-9)</h1>
+          <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">Skrining Depresi (PHQ-9)</h2>
           {!submitted ? (
             <div>
               {questions.map((q, i) => (
@@ -103,7 +127,7 @@
           ) : (
             <div className="text-center">
               {classification.icon}
-              <h2 className="text-2xl font-semibold mb-2 mt-3">Hasil Skrining</h2>
+              <h3 className="text-2xl font-semibold mb-2 mt-3">Hasil Skrining</h3>
               <p className="text-lg">Total Skor: <span className="font-bold">{total}</span></p>
               <p className="mt-2 text-xl">Klasifikasi: <span className="font-bold text-blue-700">{classification.level}</span></p>
               <p className="mt-4 text-gray-700 leading-relaxed">{classification.desc}</p>
