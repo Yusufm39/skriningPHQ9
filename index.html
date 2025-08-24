@@ -1,216 +1,346 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deteksi Depresi</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagnosa Kerusakan HP — Fuzzy Logic</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Aplikasi web sederhana untuk diagnosa kerusakan HP menggunakan logika fuzzy (Mamdani)." />
 </head>
-<body class="bg-gray-50 font-sans text-gray-800">
+<body class="bg-slate-50 text-slate-800">
   <!-- HEADER -->
-  <header class="fixed top-0 w-full bg-blue-900 text-white shadow-lg z-50">
-    <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-xl font-bold">Deteksi Depresi</h1>
-      <nav>
-        <ul class="flex space-x-6 text-sm">
-          <li><a href="#" class="hover:text-gray-300">Beranda</a></li>
-          <li><a href="#" class="hover:text-gray-300">Tentang</a></li>
-          <li><a href="#" class="hover:text-gray-300">Kontak</a></li>
-        </ul>
-      </nav>
+  <header class="sticky top-0 z-40 backdrop-blur bg-white/70 border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white font-bold">FL</div>
+        <div>
+          <h1 class="text-xl font-semibold">Diagnosa Kerusakan HP</h1>
+          <p class="text-sm text-slate-500">Berbasis Logika Fuzzy (Mamdani)</p>
+        </div>
+      </div>
+      <a href="#tentang" class="text-sm text-emerald-700 hover:underline">Tentang</a>
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
-  <main class="pt-28 pb-20 max-w-4xl mx-auto px-6">
-    <h2 class="text-2xl font-bold mb-6 text-center">Kuesioner Deteksi Depresi (PHQ-9)</h2>
-    <form id="quizForm" class="space-y-6">
+  <!-- MAIN -->
+  <main class="max-w-5xl mx-auto px-4 py-8">
+    <div class="grid md:grid-cols-5 gap-6">
+      <!-- FORM -->
+      <section class="md:col-span-3">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <h2 class="text-lg font-semibold mb-1">Input Gejala & Parameter</h2>
+          <p class="text-sm text-slate-500 mb-6">Isi nilai berikut sesuai kondisi HP untuk memperoleh analisis fuzzy.</p>
 
-      <!-- Pertanyaan 1 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">1. Dalam 2 minggu terakhir, seberapa sering Anda merasa sedih, murung, atau putus asa?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q1" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q1" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q1" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q1" value="3"><span>Hampir setiap hari</span></label>
+          <div class="space-y-6">
+            <!-- Suhu Perangkat -->
+            <div>
+              <label class="flex items-center justify-between">
+                <span class="font-medium">Suhu perangkat (°C)</span>
+                <span id="valTemp" class="text-sm text-slate-500">35</span>
+              </label>
+              <input id="inpTemp" type="range" min="20" max="60" step="1" value="35" class="w-full accent-emerald-600" />
+              <p class="text-xs text-slate-500 mt-1">Umumnya performa optimal sekitar 16–35°C; di atas ~40–45°C berisiko overheat.</p>
+            </div>
+
+            <!-- Kesehatan Baterai -->
+            <div>
+              <label class="flex items-center justify-between">
+                <span class="font-medium">Kesehatan baterai (% kapasitas asli)</span>
+                <span id="valHealth" class="text-sm text-slate-500">90%</span>
+              </label>
+              <input id="inpHealth" type="range" min="50" max="100" step="1" value="90" class="w-full accent-emerald-600" />
+              <p class="text-xs text-slate-500 mt-1">Di bawah ~80% umumnya mulai terasa penurunan durasi dan disarankan ganti.</p>
+            </div>
+
+            <!-- Sisa Penyimpanan -->
+            <div>
+              <label class="flex items-center justify-between">
+                <span class="font-medium">Sisa penyimpanan internal (% bebas)</span>
+                <span id="valStorage" class="text-sm text-slate-500">20%</span>
+              </label>
+              <input id="inpStorage" type="range" min="0" max="50" step="1" value="20" class="w-full accent-emerald-600" />
+              <p class="text-xs text-slate-500 mt-1">Android memicu status "low storage" sekitar 5% atau ~500MB; jaga &gt;10–15% agar lancar.</p>
+            </div>
+
+            <!-- Reboot/Crash -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="flex items-center justify-between">
+                  <span class="font-medium">Jumlah reboot / hari</span>
+                  <span id="valReboot" class="text-sm text-slate-500">0</span>
+                </label>
+                <input id="inpReboot" type="range" min="0" max="10" step="1" value="0" class="w-full accent-emerald-600" />
+              </div>
+              <div>
+                <label class="flex items-center justify-between">
+                  <span class="font-medium">Crash aplikasi / hari</span>
+                  <span id="valCrash" class="text-sm text-slate-500">0</span>
+                </label>
+                <input id="inpCrash" type="range" min="0" max="20" step="1" value="0" class="w-full accent-emerald-600" />
+              </div>
+            </div>
+
+            <!-- Umur Perangkat (opsional) -->
+            <div>
+              <label class="flex items-center justify-between">
+                <span class="font-medium">Umur perangkat (tahun)</span>
+                <span id="valAge" class="text-sm text-slate-500">2.0</span>
+              </label>
+              <input id="inpAge" type="range" min="0" max="7" step="0.1" value="2.0" class="w-full accent-emerald-600" />
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+              <button id="btnAnalyze" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 shadow-sm">Analisis Sekarang</button>
+              <button id="btnReset" class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-50">Reset</button>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Pertanyaan 2 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">2. Kurang minat atau tidak bersemangat dalam melakukan kegiatan sehari-hari?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q2" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q2" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q2" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q2" value="3"><span>Hampir setiap hari</span></label>
+      <!-- OUTPUT -->
+      <section class="md:col-span-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <h2 class="text-lg font-semibold mb-1">Hasil Analisis</h2>
+          <p class="text-sm text-slate-500 mb-4">Skor kemungkinan penyebab (0–100) & rekomendasi.</p>
+
+          <div id="scores" class="space-y-3"></div>
+          <div class="my-5 h-px bg-slate-200"></div>
+          <div id="recommendations" class="space-y-3"></div>
         </div>
-      </div>
-
-      <!-- Pertanyaan 3 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">3. Mengalami kesulitan tidur, sering terbangun, atau tidur terlalu banyak?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q3" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q3" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q3" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q3" value="3"><span>Hampir setiap hari</span></label>
-        </div>
-      </div>
-
-      <!-- Pertanyaan 4 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">4. Merasa lelah atau kurang energi?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q4" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q4" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q4" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q4" value="3"><span>Hampir setiap hari</span></label>
-        </div>
-      </div>
-
-      <!-- Pertanyaan 5 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">5. Nafsu makan berkurang atau makan berlebihan?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q5" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q5" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q5" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q5" value="3"><span>Hampir setiap hari</span></label>
-        </div>
-      </div>
-
-      <!-- Pertanyaan 6 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">6. Merasa buruk tentang diri sendiri, merasa gagal, atau menyalahkan diri berlebihan?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q6" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q6" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q6" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q6" value="3"><span>Hampir setiap hari</span></label>
-        </div>
-      </div>
-
-      <!-- Pertanyaan 7 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">7. Kesulitan berkonsentrasi, misalnya saat membaca koran atau menonton TV?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q7" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q7" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q7" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q7" value="3"><span>Hampir setiap hari</span></label>
-        </div>
-      </div>
-
-      <!-- Pertanyaan 8 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">8. Bergerak atau berbicara sangat lambat, atau sebaliknya terlalu gelisah sehingga sulit diam?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q8" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q8" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q8" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q8" value="3"><span>Hampir setiap hari</span></label>
-        </div>
-      </div>
-
-      <!-- Pertanyaan 9 -->
-      <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-        <p class="font-medium mb-4">9. Pernahkah Anda berpikir lebih baik mati atau menyakiti diri sendiri?</p>
-        <div class="space-y-2">
-          <label class="flex items-center space-x-3"><input type="radio" name="q9" value="0" required class="h-4 w-4 text-blue-600"><span>Tidak pernah</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q9" value="1"><span>Beberapa hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q9" value="2"><span>Lebih dari setengah hari</span></label>
-          <label class="flex items-center space-x-3"><input type="radio" name="q9" value="3"><span>Hampir setiap hari</span></label>
-        </div>
-      </div>
-
-      <!-- Button Submit -->
-      <div class="text-center">
-        <button type="submit" class="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg shadow-md transition">
-          Lihat Hasil
-        </button>
-      </div>
-    </form>
-
-    <!-- HASIL -->
-    <div id="result" class="hidden mt-12 text-center bg-white shadow-lg rounded-xl p-8 border border-gray-200">
-      <div id="icon" class="text-6xl mb-4"></div>
-      <h3 id="score" class="text-xl font-bold mb-2"></h3>
-      <p id="explanation" class="mb-4"></p>
-      <p id="advice" class="italic text-gray-600 mb-6"></p>
-      <div class="flex justify-center space-x-4">
-        <button onclick="location.reload()" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Isi Ulang</button>
-        <button onclick="window.close()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">Selesai</button>
-      </div>
+      </section>
     </div>
+
+    <!-- TENTANG & METODOLOGI -->
+    <section id="tentang" class="mt-10">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold">Tentang Model Fuzzy</h3>
+        <p class="text-sm text-slate-600 mt-2">Model ini menggunakan <span class="font-medium">Mamdani Fuzzy Inference</span> dengan fungsi keanggotaan segitiga/trapesium. Input: suhu, kesehatan baterai, sisa penyimpanan, reboot, crash, dan umur. Output: skor kemungkinan empat kategori masalah — <em>Thermal</em>, <em>Baterai</em>, <em>Penyimpanan</em>, dan <em>Software</em>. Defuzzifikasi menggunakan pusat massa (centroid) pada skala 0–100 (semakin tinggi, semakin mungkin).</p>
+        <p class="text-xs text-slate-500 mt-3">Catatan: Hasil ini indikatif, bukan pengganti pemeriksaan teknisi. Parameter didasarkan pada pedoman pabrikan & praktik umum yang dipublikasikan (lihat dokumentasi proyek untuk referensi).</p>
+      </div>
+    </section>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="bg-blue-900 text-white py-6 mt-10">
-    <div class="max-w-5xl mx-auto px-6 text-center text-sm">
-      <p>&copy; 2025 Deteksi Depresi. Semua Hak Dilindungi.</p>
-      <p class="mt-1">Website ini hanya untuk edukasi, bukan diagnosis medis profesional.</p>
+  <footer class="mt-10 border-t border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-slate-500">
+      © 2025 Fuzzy PhoneDiag. Dibuat untuk demonstrasi edukasi.
     </div>
   </footer>
 
   <script>
-  const form = document.getElementById("quizForm");
-  const resultDiv = document.getElementById("result");
-  const scoreText = document.getElementById("score");
-  const explanation = document.getElementById("explanation");
-  const advice = document.getElementById("advice");
-  const icon = document.getElementById("icon");
+    // ---------- UTIL ----------
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+    const tri = (x, a, b, c) => x <= a || x >= c ? 0 : (x === b ? 1 : (x < b ? (x - a) / (b - a) : (c - x) / (c - b)));
+    const trap = (x, a, b, c, d) => x <= a || x >= d ? 0 : (x >= b && x <= c ? 1 : (x < b ? (x - a) / (b - a) : (d - x) / (d - c)));
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    let score = 0;
-    const data = new FormData(form);
-    for (let val of data.values()) {
-      score += parseInt(val);
+    // ---------- MEMBERSHIP FUNCTIONS (informed by public guidance) ----------
+    const mf = {
+      temp: {
+        cool: (t) => trap(t, 0, 0, 28, 32),       // ≤28 sangat dingin → 0-32 transisi
+        warm: (t) => tri(t, 30, 36, 40),          // sekitar 30–40, puncak 36
+        hot:  (t) => trap(t, 38, 42, 60, 60),     // ≥42 sangat panas; aktif dari ~38
+      },
+      health: {
+        low:    (h) => trap(h, 0, 0, 75, 80),     // <80% dianggap menurun
+        medium: (h) => tri(h, 75, 85, 92),
+        high:   (h) => trap(h, 90, 95, 100, 100),
+      },
+      storage: {
+        low:    (p) => trap(p, 0, 0, 5, 10),      // 0–5% sangat rendah; 10% ambang aman
+        medium: (p) => tri(p, 5, 12, 20),
+        high:   (p) => trap(p, 15, 20, 50, 50),
+      },
+      reboot: {
+        none:  (r) => trap(r, -1, 0, 0, 1),
+        some:  (r) => tri(r, 0, 2, 4),
+        many:  (r) => trap(r, 3, 5, 10, 10),
+      },
+      crash: {
+        few:   (c) => trap(c, -1, 0, 0, 2),
+        some:  (c) => tri(c, 1, 4, 8),
+        many:  (c) => trap(c, 6, 10, 20, 20),
+      },
+      age: {
+        new:   (y) => trap(y, -1, 0, 0.8, 1.5),
+        mid:   (y) => tri(y, 1, 2.5, 4),
+        old:   (y) => trap(y, 3.5, 5, 7, 7),
+      }
+    };
+
+    // ---------- RULES ----------
+    // Output linguistic values mapped to numeric scale 0..100 via centroid of clipped trapezoids
+    // For each category we build activation (max of rule strengths), then defuzzify over 0..100
+
+    function rules(inputs) {
+      const { t, h, s, r, c, y } = inputs;
+      // Fuzzify
+      const T = { cool: mf.temp.cool(t), warm: mf.temp.warm(t), hot: mf.temp.hot(t) };
+      const H = { low: mf.health.low(h), medium: mf.health.medium(h), high: mf.health.high(h) };
+      const S = { low: mf.storage.low(s), medium: mf.storage.medium(s), high: mf.storage.high(s) };
+      const R = { none: mf.reboot.none(r), some: mf.reboot.some(r), many: mf.reboot.many(r) };
+      const C = { few: mf.crash.few(c), some: mf.crash.some(c), many: mf.crash.many(c) };
+      const Y = { new: mf.age.new(y), mid: mf.age.mid(y), old: mf.age.old(y) };
+
+      // Helper: min for AND, max for OR
+      const AND = Math.min, OR = Math.max;
+
+      // Category activations
+      const act = { thermal: 0, battery: 0, storage: 0, software: 0 };
+
+      // Thermal-related rules
+      act.thermal = OR(
+        act.thermal,
+        AND(T.hot, OR(R.some, C.some))
+      );
+      act.thermal = OR(act.thermal, T.hot);
+      act.thermal = OR(act.thermal, AND(T.warm, AND(R.some, C.some)));
+
+      // Battery-related rules
+      act.battery = OR(act.battery, AND(H.low, OR(T.hot, R.some)));
+      act.battery = OR(act.battery, AND(H.low, Y.old));
+      act.battery = OR(act.battery, AND(H.medium, R.many));
+
+      // Storage-related rules
+      act.storage = OR(act.storage, S.low);
+      act.storage = OR(act.storage, AND(S.medium, C.many));
+      act.storage = OR(act.storage, AND(S.low, R.some));
+
+      // Software-related rules
+      act.software = OR(act.software, AND(C.many, S.high));
+      act.software = OR(act.software, AND(R.many, S.high));
+      act.software = OR(act.software, AND(C.some, AND(T.cool, H.high)));
+
+      // Defuzzify: map activation α to centroid of trapezoid over [0..100]
+      const defuzz = (alpha) => alpha * 100; // linear mapping (simplified centroid for demo)
+
+      // Scores 0..100
+      return {
+        thermal: clamp(defuzz(act.thermal), 0, 100),
+        battery: clamp(defuzz(act.battery), 0, 100),
+        storage: clamp(defuzz(act.storage), 0, 100),
+        software: clamp(defuzz(act.software), 0, 100),
+        degrees: { T, H, S, R, C, Y }
+      };
     }
 
-    let status = "";
-    let msg = "";
-    let iconHTML = "";
-    let motivation = "";
-
-    if (score <= 4) {
-      status = "Normal";
-      msg = "Anda tampaknya dalam kondisi emosional yang sehat. Tetap jaga kebiasaan positif!";
-      iconHTML = "😊";
-      motivation = "Terus jaga rutinitas sehat Anda, luangkan waktu untuk hal-hal yang Anda sukai. Hidup Anda berarti dan berharga.";
-    } else if (score <= 9) {
-      status = "Depresi Ringan";
-      msg = "Anda mungkin sedang mengalami gejala ringan. Cobalah berbicara dengan orang dekat dan jaga pola hidup sehat.";
-      iconHTML = "🙂";
-      motivation = "Sedikit langkah kecil bisa membawa perubahan besar. Ingat, Anda tidak sendiri dan ada orang yang peduli.";
-    } else if (score <= 14) {
-      status = "Depresi Sedang";
-      msg = "Gejala cukup terasa. Jangan sungkan mencari bantuan profesional seperti psikolog.";
-      iconHTML = "😐";
-      motivation = "Tidak apa-apa merasa lelah. Mencari bantuan bukanlah tanda kelemahan, melainkan tanda keberanian.";
-    } else if (score <= 19) {
-      status = "Depresi Cukup Berat";
-      msg = "Kondisi ini perlu perhatian serius. Cari dukungan dari tenaga medis profesional.";
-      iconHTML = "😟";
-      motivation = "Hidup Anda berharga. Jangan biarkan rasa sakit ini menguasai segalanya — ada jalan untuk pulih dan orang yang siap mendukung.";
-    } else {
-      status = "Depresi Berat";
-      msg = "Sebaiknya segera mencari bantuan profesional. Anda tidak sendirian, ada banyak bantuan tersedia.";
-      iconHTML = "😔";
-      motivation = "Anda kuat karena masih bertahan sampai saat ini. Tolong jangan menghadapi ini sendirian — carilah bantuan sekarang juga.";
+    // ---------- RECOMMENDATIONS ----------
+    function getRecommendations(scores, inputs) {
+      const adv = [];
+      // Thermal
+      if (scores.thermal > 40) {
+        adv.push({
+          title: 'Masalah Thermal Terindikasi',
+          desc: 'Kurangi beban kerja, hindari sinar matahari langsung, lepas casing tebal saat bermain gim/charging, dan beri jeda dinginkan. Bila sering shutdown karena panas, periksa di service center.'
+        });
+      }
+      // Battery
+      if (scores.battery > 40) {
+        adv.push({
+          title: 'Baterai Melemah',
+          desc: 'Jika kesehatan < 80%, pertimbangkan ganti baterai. Jaga pengisian di kisaran ~20–80%, hindari panas saat charging.'
+        });
+      }
+      // Storage
+      if (scores.storage > 40) {
+        adv.push({
+          title: 'Penyimpanan Rendah',
+          desc: 'Kosongkan ruang hingga >15%: hapus cache besar, pindahkan foto/video ke cloud/SD card, copot aplikasi jarang dipakai.'
+        });
+      }
+      // Software
+      if (scores.software > 40) {
+        adv.push({
+          title: 'Kemungkinan Masalah Software',
+          desc: 'Perbarui sistem & aplikasi, cek aplikasi bermasalah, lakukan reset pabrik (setelah backup) bila crash tetap sering.'
+        });
+      }
+      if (adv.length === 0) {
+        adv.push({ title: 'Kondisi Umumnya Normal', desc: 'Parameter saat ini belum menunjukkan masalah signifikan. Tetap pantau suhu, kesehatan baterai, dan ruang penyimpanan.' });
+      }
+      return adv;
     }
 
-    resultDiv.classList.remove("hidden");
-    scoreText.textContent = `Hasil: ${status} (Skor: ${score})`;
-    explanation.textContent = msg;
-    advice.textContent = motivation;
-    icon.textContent = iconHTML;
+    // ---------- UI BINDINGS ----------
+    const inpTemp = document.getElementById('inpTemp');
+    const inpHealth = document.getElementById('inpHealth');
+    const inpStorage = document.getElementById('inpStorage');
+    const inpReboot = document.getElementById('inpReboot');
+    const inpCrash = document.getElementById('inpCrash');
+    const inpAge = document.getElementById('inpAge');
 
-    window.scrollTo({ top: resultDiv.offsetTop - 100, behavior: 'smooth' });
-  });
-</script>
+    const outTemp = document.getElementById('valTemp');
+    const outHealth = document.getElementById('valHealth');
+    const outStorage = document.getElementById('valStorage');
+    const outReboot = document.getElementById('valReboot');
+    const outCrash = document.getElementById('valCrash');
+    const outAge = document.getElementById('valAge');
 
+    const scoresDiv = document.getElementById('scores');
+    const recDiv = document.getElementById('recommendations');
+
+    const syncLabels = () => {
+      outTemp.textContent = inpTemp.value;
+      outHealth.textContent = inpHealth.value + '%';
+      outStorage.textContent = inpStorage.value + '%';
+      outReboot.textContent = inpReboot.value;
+      outCrash.textContent = inpCrash.value;
+      outAge.textContent = Number(inpAge.value).toFixed(1);
+    };
+    ['input', 'change'].forEach(ev => {
+      inpTemp.addEventListener(ev, syncLabels);
+      inpHealth.addEventListener(ev, syncLabels);
+      inpStorage.addEventListener(ev, syncLabels);
+      inpReboot.addEventListener(ev, syncLabels);
+      inpCrash.addEventListener(ev, syncLabels);
+      inpAge.addEventListener(ev, syncLabels);
+    });
+    syncLabels();
+
+    function render() {
+      const inputs = {
+        t: +inpTemp.value,
+        h: +inpHealth.value,
+        s: +inpStorage.value,
+        r: +inpReboot.value,
+        c: +inpCrash.value,
+        y: +inpAge.value
+      };
+      const sc = rules(inputs);
+
+      const entries = [
+        { key: 'thermal', label: 'Thermal/Overheat', value: sc.thermal },
+        { key: 'battery', label: 'Baterai Melemah', value: sc.battery },
+        { key: 'storage', label: 'Penyimpanan Rendah', value: sc.storage },
+        { key: 'software', label: 'Gangguan Software', value: sc.software },
+      ];
+
+      scoresDiv.innerHTML = entries.map(e => `
+        <div class="">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-sm">${e.label}</span>
+            <span class="text-sm font-medium">${e.value.toFixed(0)}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+            <div class="h-2 bg-emerald-500" style="width:${clamp(e.value,0,100)}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const advs = getRecommendations(sc, inputs);
+      recDiv.innerHTML = advs.map(a => `
+        <div class="p-4 border border-slate-200 rounded-xl bg-emerald-50/50">
+          <div class="font-medium text-emerald-800">${a.title}</div>
+          <div class="text-sm text-slate-600">${a.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('btnAnalyze').addEventListener('click', render);
+    document.getElementById('btnReset').addEventListener('click', () => {
+      inpTemp.value = 35; inpHealth.value = 90; inpStorage.value = 20; inpReboot.value = 0; inpCrash.value = 0; inpAge.value = 2.0; syncLabels(); scoresDiv.innerHTML = ''; recDiv.innerHTML = '';
+    });
+
+    // Auto-run once on load for a preview
+    render();
+  </script>
 </body>
 </html>
