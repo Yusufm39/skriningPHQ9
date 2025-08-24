@@ -3,178 +3,119 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Skrining Depresi — PHQ‑9</title>
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- React + ReactDOM CDN -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Babel CDN -->
+  <title>Skrining Depresi (PHQ-9)</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800">
-  <div id="root"></div>
-
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div id="root" class="w-full max-w-2xl"></div>
   <script type="text/babel">
-    const { useState, useMemo, useEffect } = React;
+    const questions = [
+      "Sedikit minat atau kesenangan dalam melakukan hal-hal",
+      "Merasa murung, depresi, atau putus asa",
+      "Kesulitan tidur atau terlalu banyak tidur",
+      "Merasa lelah atau kurang energi",
+      "Nafsu makan buruk atau makan berlebihan",
+      "Merasa buruk tentang diri sendiri — atau merasa gagal",
+      "Kesulitan berkonsentrasi pada sesuatu, misalnya membaca koran atau menonton televisi",
+      "Gerakan atau bicara sangat lambat sehingga orang lain memperhatikannya, atau sebaliknya — terlalu gelisah atau tidak bisa diam",
+      "Pikiran bahwa lebih baik mati atau menyakiti diri sendiri"
+    ];
+
+    const options = [
+      { label: "Tidak sama sekali", value: 0 },
+      { label: "Beberapa hari", value: 1 },
+      { label: "Lebih dari setengah hari", value: 2 },
+      { label: "Hampir setiap hari", value: 3 }
+    ];
+
+    function classifyScore(total) {
+      if (total <= 4) return { level: "Minimal", desc: "Kemungkinan tidak ada depresi klinis. Tetap jaga kesehatan mental dan fisik." };
+      if (total <= 9) return { level: "Ringan", desc: "Terdapat gejala ringan. Coba lakukan aktivitas menyenangkan, olahraga ringan, tidur cukup, dan curhat ke orang terdekat." };
+      if (total <= 14) return { level: "Sedang", desc: "Ada indikasi depresi sedang. Disarankan konsultasi dengan tenaga kesehatan atau psikolog untuk dukungan lebih lanjut." };
+      if (total <= 19) return { level: "Sedang Berat", desc: "Gejala cukup signifikan. Penting mencari bantuan profesional segera untuk evaluasi lebih mendalam." };
+      return { level: "Berat", desc: "Gejala sangat serius. Segera hubungi psikolog/psikiater. Jika ada pikiran untuk menyakiti diri, segera hubungi layanan darurat atau orang terdekat." };
+    }
 
     function App() {
-      const [step, setStep] = useState("intro");
-      const [answers, setAnswers] = useState(Array(9).fill(-1));
-      const [dark, setDark] = useState(false);
+      const [answers, setAnswers] = React.useState(Array(questions.length).fill(null));
+      const [submitted, setSubmitted] = React.useState(false);
 
-      useEffect(() => {
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setDark(prefersDark);
-      }, []);
+      const total = answers.reduce((acc, val) => acc + (val ?? 0), 0);
+      const classification = classifyScore(total);
 
-      const questions = [
-        "Sedikit minat atau kesenangan dalam melakukan hal-hal",
-        "Merasa murung, depresi, atau putus asa",
-        "Kesulitan tidur, tetap tertidur, atau terlalu banyak tidur",
-        "Merasa lelah atau kurang energi",
-        "Nafsu makan buruk atau makan berlebihan",
-        "Merasa buruk tentang diri sendiri — atau merasa Anda gagal atau telah mengecewakan diri/keluarga",
-        "Kesulitan berkonsentrasi pada hal-hal, seperti membaca koran atau menonton TV",
-        "Bergerak atau berbicara sangat lambat hingga orang lain menyadarinya, atau sebaliknya merasa gelisah sehingga sulit untuk diam",
-        "Pikiran bahwa Anda akan lebih baik mati atau berniat melukai diri sendiri",
-      ];
+      function handleChange(qIndex, value) {
+        const newAnswers = [...answers];
+        newAnswers[qIndex] = value;
+        setAnswers(newAnswers);
+      }
 
-      const options = [
-        { label: "Tidak sama sekali", value: 0 },
-        { label: "Beberapa hari", value: 1 },
-        { label: "Lebih dari setengah hari", value: 2 },
-        { label: "Hampir setiap hari", value: 3 },
-      ];
-
-      const total = useMemo(() => answers.reduce((a, b) => a + (b > -1 ? b : 0), 0), [answers]);
-
-      const severity = useMemo(() => {
-        if (answers.includes(-1)) return null;
-        if (total <= 4) return { level: "Minimal", color: "from-emerald-500 to-emerald-600" };
-        if (total <= 9) return { level: "Ringan", color: "from-lime-500 to-lime-600" };
-        if (total <= 14) return { level: "Sedang", color: "from-amber-500 to-amber-600" };
-        if (total <= 19) return { level: "Cukup Berat", color: "from-orange-500 to-orange-600" };
-        return { level: "Berat", color: "from-rose-500 to-rose-600" };
-      }, [answers, total]);
-
-      const hasSuicideIdeation = useMemo(() => answers[8] > 0, [answers]);
-
-      const progress = useMemo(() => {
-        const answered = answers.filter(v => v > -1).length;
-        return Math.round((answered / questions.length) * 100);
-      }, [answers, questions.length]);
-
-      const reset = () => {
-        setAnswers(Array(9).fill(-1));
-        setStep("intro");
-      };
-
-      const saveToLocal = () => {
-        const data = { date: new Date().toISOString(), answers, total };
-        const history = JSON.parse(localStorage.getItem("phq9_history") || "[]");
-        history.unshift(data);
-        localStorage.setItem("phq9_history", JSON.stringify(history.slice(0, 10)));
-      };
-
-      const printableAdvice = useMemo(() => {
-        if (answers.includes(-1)) return "Selesaikan semua pertanyaan untuk melihat ringkasan.";
-        let base = `Skor PHQ-9 Anda: ${total} (${severity?.level}).`;
-        if (hasSuicideIdeation) {
-          base += " Terdapat jawaban pada butir 9. Jika Anda merasa tidak aman, segera cari pertolongan darurat.";
+      function handleSubmit() {
+        if (answers.includes(null)) {
+          alert("Harap isi semua pertanyaan.");
+          return;
         }
-        base += " Ini bukan diagnosis medis. Diskusikan hasil ini dengan profesional kesehatan jiwa.";
-        return base;
-      }, [answers, total, severity, hasSuicideIdeation]);
+        setSubmitted(true);
+      }
 
       return (
-        <div className={dark ? "dark" : ""}>
-          <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-800">
-            <header className="sticky top-0 z-10 backdrop-blur bg-white/60 border-b border-slate-200/60">
-              <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-                <h1 className="text-xl font-semibold">Skrining Depresi — PHQ‑9</h1>
-                <button onClick={() => setDark(d => !d)} className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-sm">
-                  {dark ? "☀️ Terang" : "🌙 Gelap"}
-                </button>
-              </div>
-            </header>
-
-            <main className="max-w-4xl mx-auto px-4 py-8">
-              {step === "intro" && (
-                <section className="grid gap-6">
-                  <div className="rounded-2xl p-6 bg-white/70 border border-slate-200 shadow-sm">
-                    <h2 className="text-2xl font-semibold mb-2">Tentang Alat Ini</h2>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      Alat ini menggunakan <span className="font-medium">PHQ‑9</span>, instrumen skrining untuk gejala depresi. Hasilnya <span className="font-semibold">bukan diagnosis</span> dan sebaiknya digunakan untuk diskusi dengan profesional kesehatan jiwa.
-                    </p>
-                    <div className="mt-4 flex gap-3">
-                      <button onClick={() => setStep("assessment")} className="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white font-medium shadow">
-                        Mulai Penilaian
-                      </button>
-                    </div>
+        <div className="bg-white shadow-lg rounded-2xl p-6">
+          <h1 className="text-2xl font-bold text-center mb-4">Skrining Depresi (PHQ-9)</h1>
+          {!submitted ? (
+            <div>
+              {questions.map((q, i) => (
+                <div key={i} className="mb-4">
+                  <p className="font-medium mb-2">{i + 1}. {q}</p>
+                  <div className="flex flex-wrap gap-3">
+                    {options.map((opt) => (
+                      <label key={opt.value} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name={`q-${i}`}
+                          value={opt.value}
+                          checked={answers[i] === opt.value}
+                          onChange={() => handleChange(i, opt.value)}
+                        />
+                        {opt.label}
+                      </label>
+                    ))}
                   </div>
-                </section>
+                </div>
+              ))}
+              <button
+                onClick={handleSubmit}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg mt-4"
+              >
+                Lihat Hasil
+              </button>
+            </div>
+          ) : (
+            <div className="text-center">
+              <h2 className="text-xl font-semibold mb-2">Hasil Skrining</h2>
+              <p className="text-lg">Total Skor: <span className="font-bold">{total}</span></p>
+              <p className="mt-2 text-lg">Klasifikasi: <span className="font-bold">{classification.level}</span></p>
+              <p className="mt-3 text-gray-700">{classification.desc}</p>
+              {answers[8] > 0 && (
+                <p className="mt-4 text-red-600 font-semibold">
+                  ⚠️ Anda menandai adanya pikiran untuk menyakiti diri. Mohon segera cari bantuan profesional atau hubungi layanan darurat.
+                </p>
               )}
-
-              {step === "assessment" && (
-                <section className="grid gap-6">
-                  <div className="rounded-2xl p-6 bg-white/70 border border-slate-200 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-semibold">Pertanyaan</h2>
-                      <div className="text-sm text-slate-600">{progress}% terjawab</div>
-                    </div>
-
-                    <ol className="space-y-6">
-                      {questions.map((q, i) => (
-                        <li key={i} className="rounded-xl border border-slate-200 p-4 bg-white/60">
-                          <p className="font-medium mb-3">{i + 1}. {q}</p>
-                          <div className="grid sm:grid-cols-4 gap-2">
-                            {options.map((opt) => {
-                              const id = `q-${i}-${opt.value}`;
-                              const selected = answers[i] === opt.value;
-                              return (
-                                <label key={id} htmlFor={id} className={`flex items-center gap-2 rounded-xl border p-3 cursor-pointer text-sm ${selected ? "border-indigo-600 bg-indigo-50" : "border-slate-200 hover:bg-slate-50"}`}>
-                                  <input id={id} type="radio" name={`q-${i}`} className="hidden" checked={selected} onChange={() => setAnswers(prev => prev.map((v, idx) => idx === i ? opt.value : v))} />
-                                  <span>{opt.label}</span>
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </li>
-                      ))}
-                    </ol>
-
-                    <div className="mt-6 flex gap-3">
-                      <button onClick={() => setStep("intro")} className="px-4 py-3 rounded-2xl border border-slate-200 hover:bg-slate-100">Kembali</button>
-                      <button onClick={() => { if (answers.includes(-1)) { alert("Jawab semua pertanyaan dulu"); return;} saveToLocal(); setStep("result"); }} className="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white font-medium shadow">Lihat Hasil</button>
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {step === "result" && (
-                <section className="grid gap-6">
-                  <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-                    <div className={`p-6 bg-gradient-to-r ${severity?.color} text-white`}>
-                      <h2 className="text-2xl font-semibold">Ringkasan Hasil</h2>
-                    </div>
-                    <div className="p-6 bg-white/70">
-                      <p className="mb-4 text-sm">{printableAdvice}</p>
-                      <div className="mt-6 flex gap-3">
-                        <button onClick={() => setStep("assessment")} className="px-4 py-3 rounded-2xl border border-slate-200 hover:bg-slate-100">Ubah Jawaban</button>
-                        <button onClick={reset} className="px-4 py-3 rounded-2xl border border-slate-200 hover:bg-slate-100">Selesai</button>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              )}
-            </main>
-          </div>
+              <button
+                onClick={() => setSubmitted(false)}
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg mt-6"
+              >
+                Isi Ulang Kuesioner
+              </button>
+            </div>
+          )}
         </div>
       );
     }
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
   </script>
 </body>
 </html>
